@@ -1,0 +1,54 @@
+@import '../../variables.scss';
+
+$background: rgba(#fff, 0.8);
+
+.navbar {
+  display: flex;
+  background: #fff;
+  width: 100%;
+
+  &.mobile {
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .brand {
+    text-decoration: none;
+    font-family: 'Roboto Condensed', sans-serif;
+    color: #000;
+    font-size: 2rem;
+    margin-right: 2rem;
+  }
+
+  .navigation {
+    display: flex;
+    justify-content: space-between;
+    flex-grow: 1;
+  }
+
+  .buttons {
+    .button:first-of-type {
+      margin-right: 1rem;
+    }
+  }
+}
+
+.drawer {
+  .ant-menu-item {
+    // text-align: right;
+    padding-right: 24px;
+    padding-left: 16px;
+
+    &:after {
+      right: auto;
+      left: 0;
+    }
+  }
+}
+
+// make active and hover effects on top
+//.navbar.ant-menu-horizontal>.ant-menu-item-selected,
+//.navbar.ant-menu-horizontal>.ant-menu-submenu-open {
+//  border-top:2px solid #1890ff;
+//  border-bottom:2px solid transparent
+//}

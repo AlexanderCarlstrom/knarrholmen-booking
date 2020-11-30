@@ -1,0 +1,55 @@
+$padding: 40px;
+
+// auth container styles
+.container {
+  width: 100vw;
+  height: 100vh;
+  padding: $padding;
+
+  @media screen and (max-width: 576px) {
+    padding: 0;
+  }
+
+  .content {
+    width: 100%;
+    height: calc(100vh - 2 * #{$padding});
+    background-color: #fff;
+    padding: 24px;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    @media screen and (max-width: 576px) {
+      height: 100%;
+    }
+
+    .back-btn {
+      position: absolute;
+      top: 24px;
+      left: 24px;
+    }
+
+    .form {
+      margin: auto;
+      width: 100%;
+      max-width: 400px;
+
+      .title {
+        font-family: 'Roboto Condensed', sans-serif;
+        font-size: 2rem;
+      }
+
+      .submit-btn {
+        width: 100%;
+      }
+    }
+  }
+}
+
+// shared styles
+.actions {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
