@@ -63,7 +63,7 @@ namespace booking_api
 
             services.AddCors(c =>
             {
-                c.AddPolicy("AllowOrigin", options => options.WithOrigins("http://localhost:4200").WithHeaders("Access-Control-Allow-Origin", "Content-Type"));
+                c.AddPolicy("AllowOrigin", options => options.WithOrigins(Configuration["CorsOrigin"]).WithHeaders("Access-Control-Allow-Origin", "Content-Type"));
             });
 
 
@@ -82,7 +82,6 @@ namespace booking_api
             }
 
             app.UseRouting();
-            // app.UseCors(options => options.WithOrigins("http://localhost:4200"));
             app.UseCors("AllowOrigin");
 
             app.UseAuthentication();
