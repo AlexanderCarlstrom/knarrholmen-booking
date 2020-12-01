@@ -40,16 +40,12 @@ $padding: 40px;
         font-size: 2rem;
       }
 
-      .submit-btn {
-        width: 100%;
+      .actions {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
       }
     }
   }
 }
 
-// shared styles
-.actions {
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-}
