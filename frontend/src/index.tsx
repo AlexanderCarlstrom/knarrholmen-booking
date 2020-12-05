@@ -1,28 +1,16 @@
-import React from 'react';
 import ReactDOM from 'react-dom';
-import { BrowserRouter as Router } from 'react-router-dom';
-import App from './App';
-import { BreakpointProvider } from './context/BreakpointContext';
-import './index.scss';
-import reportWebVitals from './reportWebVitals';
+import React from 'react';
 
-// const breakpoints = {
-//   mobile: 320,
-//   mobileLandscape: 480,
-//   tablet: 768,
-//   tabletLandscape: 1024,
-//   desktop: 1200,
-//   desktopLarge: 1500,
-//   desktopWide: 1920,
-// };
+import reportWebVitals from './reportWebVitals';
+import AppProvider from './AppProvider';
+import App from './App';
+import './index.scss';
 
 ReactDOM.render(
   <React.StrictMode>
-    <Router>
-      <BreakpointProvider>
-        <App />
-      </BreakpointProvider>
-    </Router>
+    <AppProvider>
+      <App />
+    </AppProvider>
   </React.StrictMode>,
   document.getElementById('root'),
 );

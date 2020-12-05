@@ -30,22 +30,30 @@ $padding: 40px;
       left: 24px;
     }
 
-    .form {
+    .form-container {
       margin: auto;
       width: 100%;
-      max-width: 400px;
+      max-width: 500px;
 
       .title {
         font-family: 'Roboto Condensed', sans-serif;
         font-size: 2rem;
+        text-align: center;
+        margin-bottom: 10px;
       }
 
-      .actions {
-        display: flex;
-        justify-content: space-between;
-        flex-wrap: wrap;
+      .link-text {
+        display: block;
+        text-align: center;
+      }
+
+      .form {
+        margin-top: 40px;
+
+        .submit-btn {
+          width: 100%;
+        }
       }
     }
   }
 }
-

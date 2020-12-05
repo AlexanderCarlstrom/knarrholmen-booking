@@ -1,4 +1,6 @@
-namespace booking_api.Models
+using api.Entities;
+
+namespace api.Models
 {
     public class LoginResponse : Response
     {

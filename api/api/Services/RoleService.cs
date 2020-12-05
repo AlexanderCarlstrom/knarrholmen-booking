@@ -1,6 +1,6 @@
 using System.Linq;
 using System.Threading.Tasks;
-using booking_api.Models;
+using api.Models;
 using Microsoft.AspNetCore.Identity;
 
 namespace booking_api.Services

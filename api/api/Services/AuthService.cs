@@ -1,38 +1,38 @@
 using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
-using System.Security.Claims;
-using System.Text;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
-using booking_api.Models;
-using Microsoft.AspNetCore.Http;
+using api.Models;
+using api.Entities;
+using booking_api.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
 
-namespace booking_api.Services
+namespace api.Services
 {
     public class AuthService : IAuthService
     {
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
-        private readonly IConfiguration _configuration;
+        private readonly BookingContext _bookingContext;
 
         public AuthService(UserManager<User> userManager, SignInManager<User> signInManager,
-            IConfiguration configuration)
+            BookingContext bookingContext)
         {
             _userManager = userManager;
             _signInManager = signInManager;
-            _configuration = configuration;
+            _bookingContext = bookingContext;
         }
 
 
-        public async Task<Response> RegisterUserAsync(RegisterModel model)
+        /// <summary>
+        /// Creates a new user with given credentials and personal info
+        /// </summary>
+        public async Task<ApiResponse> RegisterUserAsync(RegisterModel model)
         {
             // check if user already exist
             var user = await _userManager.FindByEmailAsync(model.Email);
-            if (user != null) return Response.UnprocessableEntity("User already exist");
+            if (user != null) return new ApiResponse(false, "User already exist", 422);
 
             var newUser = new User
             {
@@ -41,7 +41,6 @@ namespace booking_api.Services
                 UserName = model.Email,
                 Email = model.Email,
             };
-            
 
             var result = await _userManager.CreateAsync(newUser, model.Password);
 
@@ -51,90 +50,63 @@ namespace booking_api.Services
                 // TODO
                 // Send confirmation email
 
-                return Response.Created("User created successfully");
+                return new ApiResponse(201);
             }
 
             // return user registration errors
-            var response = Response.BadRequest("Could not register user, please try again");
-            response.Errors = result.Errors.Select(err => err.Description);
-            return response;
+            var errors = result.Errors.Select(err => err.Description);
+            return new ApiResponse("Could not register user, please try again", 400, errors);
         }
 
-        /**
-         * <summary>Login use with provided email and password</summary>
-         */
-        public async Task<Response> LoginUserAsync(LoginModel model)
+        /// <summary>
+        /// Login with given email and password
+        /// </summary>
+        public async Task<ApiResponse> LoginUserAsync(LoginModel model)
         {
             // check if user exist
             var user = await _userManager.FindByEmailAsync(model.Email);
-            if (user == null) return Response.BadRequest("Wrong email or password");
+            if (user == null) return new ApiResponse("Wrong email or password", 400);
 
             // attempt user login with provided credentials
-            var signInResult = await _userManager.CheckPasswordAsync(user, model.Password);
-            if (!signInResult) return Response.BadRequest("Wrong email or password");
-            
+            var signInResult = await _signInManager.PasswordSignInAsync(user, model.Password, true, false);
+            if (!signInResult.Succeeded) return new ApiResponse("Wrong email or password", 400);
+
             // get user roles
             user.Roles = await _userManager.GetRolesAsync(user);
+            var token = CreateRefreshToken();
+            user.RefreshTokens.Add(token);
+            _bookingContext.Update(user);
+            _bookingContext.SaveChanges();
 
-            // create sing in response
-            var response = new LoginResponse
-            {
-                Message = "User authenticated",
-                StatusCode = StatusCodes.Status200OK,
-                Success = true,
-                User = user,
-                JWT = await GenerateJwt(user),
-            };
-            return response;
+            return new ApiResponse(user, token);
         }
 
-        public Task<Response> ConfirmEmailAsync(ConfirmEmailModel model)
+        public Task<ApiResponse> ConfirmEmailAsync(ConfirmEmailModel model)
         {
             throw new System.NotImplementedException();
         }
 
-        public Task<Response> ForgetPasswordAsync(ForgetPasswordModel model)
+        public Task<ApiResponse> ForgetPasswordAsync(ForgetPasswordModel model)
         {
             throw new System.NotImplementedException();
         }
 
-        public Task<Response> ResetPasswordAsync(ResetPasswordModel model)
+        public Task<ApiResponse> ResetPasswordAsync(ResetPasswordModel model)
         {
             throw new System.NotImplementedException();
         }
 
         // helper methods
-        /**
-         * <summary>Generate jwt with user credentials</summary>
-         */
-        private async Task<string> GenerateJwt(User user)
+        private static RefreshToken CreateRefreshToken()
         {
-            // get user roles
-            var userRoles = await _userManager.GetRolesAsync(user);
-
-            // create new claims
-            var authClaims = new List<Claim>
+            var rnd = new byte[32];
+            using var generator = new RNGCryptoServiceProvider();
+            generator.GetBytes(rnd);
+            return new RefreshToken
             {
-                new Claim("id", user.Id),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                Token = Convert.ToBase64String(rnd),
+                ExpiresAt = DateTime.Now.AddDays(30)
             };
-
-            // add user roles to claims
-            authClaims.AddRange(userRoles.Select(userRole => new Claim(ClaimTypes.Role, userRole)));
-
-            // create sign in key from secret
-            var signInKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
-
-            // create jwt
-            var token = new JwtSecurityToken(
-                _configuration["JWT:ValidIssuer"],
-                _configuration["JWT:ValidAudience"],
-                expires: DateTime.Now.AddMinutes(15),
-                claims: authClaims,
-                signingCredentials: new SigningCredentials(signInKey, SecurityAlgorithms.HmacSha256)
-            );
-
-            return new JwtSecurityTokenHandler().WriteToken(token);
         }
     }
 }

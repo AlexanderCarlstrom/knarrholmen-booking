@@ -1,7 +1,8 @@
+using api.Entities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace booking_api.Models
+namespace api.Models
 {
     public class BookingContext : IdentityDbContext<User>
     {

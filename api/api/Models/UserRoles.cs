@@ -1,4 +1,4 @@
-namespace booking_api.Models
+namespace api.Models
 {
     public static class UserRoles
     {

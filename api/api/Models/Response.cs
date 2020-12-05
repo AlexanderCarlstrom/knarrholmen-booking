@@ -1,9 +1,7 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 
-namespace booking_api.Models
+namespace api.Models
 {
     public class Response
     {

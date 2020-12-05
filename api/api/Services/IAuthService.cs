@@ -1,14 +1,14 @@
 using System.Threading.Tasks;
-using booking_api.Models;
+using api.Models;
 
 namespace booking_api.Services
 {
     public interface IAuthService
     {
-        Task<Response> RegisterUserAsync(RegisterModel model);
-        Task<Response> LoginUserAsync(LoginModel model);
-        Task<Response> ConfirmEmailAsync(ConfirmEmailModel model);
-        Task<Response> ForgetPasswordAsync(ForgetPasswordModel model);
-        Task<Response> ResetPasswordAsync(ResetPasswordModel model);
+        Task<ApiResponse> RegisterUserAsync(RegisterModel model);
+        Task<ApiResponse> LoginUserAsync(LoginModel model);
+        Task<ApiResponse> ConfirmEmailAsync(ConfirmEmailModel model);
+        Task<ApiResponse> ForgetPasswordAsync(ForgetPasswordModel model);
+        Task<ApiResponse> ResetPasswordAsync(ResetPasswordModel model);
     }
 }

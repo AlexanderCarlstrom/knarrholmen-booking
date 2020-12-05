@@ -1,14 +1,13 @@
-using System;
 using System.Threading.Tasks;
-using booking_api.Models;
+using api.Models;
 using booking_api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
-namespace booking_api.Controllers
+namespace api.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    // [Authorize(Roles = "Admin")]
     [Route("roles")]
     [ApiController]
     [EnableCors("AllowOrigin")]

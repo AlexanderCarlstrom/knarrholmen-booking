@@ -1,17 +1,17 @@
+using System;
+using api.Entities;
+using api.Models;
+using api.Services;
+using booking_api.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System.Text;
-using booking_api.Models;
-using booking_api.Services;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 
-namespace booking_api
+namespace api
 {
     public class Startup
     {
@@ -39,38 +39,25 @@ namespace booking_api
                 options.SignIn.RequireConfirmedEmail = true;
             });
 
-            // add authentication
-            services.AddAuthentication(options =>
-                {
-                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-                })
-                .AddJwtBearer(options =>
-                {
-                    options.SaveToken = true;
-                    options.RequireHttpsMetadata = false;
-                    options.TokenValidationParameters = new TokenValidationParameters()
-                    {
-                        ValidateIssuer = true,
-                        ValidateAudience = true,
-                        ValidIssuer = Configuration["JWT:ValidIssuer"],
-                        ValidAudience = Configuration["JWT:ValidAudience"],
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JWT:Secret"]))
-                    };
-                });
-
+            services.ConfigureApplicationCookie(options =>
+            {
+                options.Cookie.Name = "access-token";
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(20);
+                options.Cookie.HttpOnly = true;
+            });
 
             services.AddCors(c =>
             {
-                c.AddPolicy("AllowOrigin", options => options.WithOrigins(Configuration["CorsOrigin"]).WithHeaders("Access-Control-Allow-Origin", "Content-Type"));
+                c.AddPolicy("AllowOrigin",
+                    options => options.WithOrigins(Configuration["CorsOrigin"])
+                        .WithHeaders("Access-Control-Allow-Origin", "Content-Type"));
             });
-
 
             services.AddScoped<IRoleService, RoleService>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IActivityService, ActivityService>();
-            services.AddControllers();
+            services.AddControllers()
+                .AddJsonOptions(options => options.JsonSerializerOptions.IgnoreNullValues = true);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -1,12 +1,14 @@
+using System;
 using System.Threading.Tasks;
-using booking_api.Models;
+using api.Models;
 using booking_api.Services;
 using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace booking_api.Controllers
+namespace api.Controllers
 {
-    [Route("users")]
+    [Route("[controller]")]
     [ApiController]
     [EnableCors("AllowOrigin")]
     public class AuthController : ControllerBase
@@ -23,7 +25,7 @@ namespace booking_api.Controllers
         public async Task<IActionResult> Register([FromBody] RegisterModel model)
         {
             var response = await _authService.RegisterUserAsync(model);
-            return StatusCode(response.StatusCode, response);
+            return StatusCode(response.Status);
         }
 
         [HttpPost]
@@ -31,7 +33,18 @@ namespace booking_api.Controllers
         public async Task<IActionResult> Login([FromBody] LoginModel model)
         {
             var response = await _authService.LoginUserAsync(model);
-            return StatusCode(response.StatusCode, response);
+            SetRefreshTokenCookie(response.RefreshToken.Token);
+            return StatusCode(response.Status, response);
+        }
+        
+        private void SetRefreshTokenCookie(string token)
+        {
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Expires = DateTime.Now.AddDays(30)
+            };
+            Response.Cookies.Append("refresh-token", token, cookieOptions);
         }
     }
 }

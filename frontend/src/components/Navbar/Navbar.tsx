@@ -5,6 +5,7 @@ import React, { useState } from 'react';
 import 'antd/dist/antd.css';
 
 import { useBreakpoint } from '../../context/BreakpointContext';
+import AuthService from '../../services/auth.service';
 import './Navbar.scss';
 
 const { Header } = Layout;
@@ -78,14 +79,16 @@ const MobileMenu = ({ pathName }: MenuProps) => {
             <Link to="/activities">Activities</Link>
           </Menu.Item>
         </Menu>
-        <Menu mode="inline" className="drawer-menu">
-          <Menu.Item>
-            <Link to="/auth/sign-in">Sign In</Link>
-          </Menu.Item>
-          <Menu.Item>
-            <Link to="/auth/sign-up">Sign Up</Link>
-          </Menu.Item>
-        </Menu>
+        {AuthService.user === null && (
+          <Menu mode="inline" className="drawer-menu">
+            <Menu.Item>
+              <Link to="/auth/sign-in">Sign In</Link>
+            </Menu.Item>
+            <Menu.Item>
+              <Link to="/auth/sign-up">Sign Up</Link>
+            </Menu.Item>
+          </Menu>
+        )}
       </Drawer>
     </React.Fragment>
   );

@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace booking_api.Models
+namespace api.Models
 {
     /**
      * Register model used for registration input
