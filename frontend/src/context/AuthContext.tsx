@@ -3,35 +3,40 @@ import { AxiosResponse } from 'axios';
 
 import { ContainterProps } from '../types/ContainterProps';
 import { ApiResponse } from '../types/ApiReponse';
-import { publicFetch } from '../utils/axios';
+import { privateFetch, publicFetch } from '../utils/axios';
 
 const AuthContext = React.createContext(null);
 
 const AuthProvider = ({ children }: ContainterProps) => {
   const [user, setUser] = useState(null);
 
-  const login = (credentials: LoginValues) => {
+  const logIn = (credentials: LoginValues) => {
     return publicFetch
-      .post<ApiResponse>('users/login', credentials)
+      .post<ApiResponse>('auth/login', credentials)
       .then((response: AxiosResponse<ApiResponse>) => {
         const { data } = response;
         if (data.success) {
-          setUser(user);
+          setUser(data.user);
         }
         return data;
       })
       .catch((err) => err.response.data);
   };
 
-  const signUp = (credentials: SignUpValues) => publicFetch.post<ApiResponse>('users/register', credentials);
+  const signUp = (credentials: SignUpValues) => publicFetch.post<ApiResponse>('auth/register', credentials);
+
+  const logout = () => {
+    setUser(null);
+  };
 
   return (
     <AuthContext.Provider
       value={{
         user,
         setUser,
-        login: (credentials: LoginValues) => login(credentials),
+        logIn: (credentials: LoginValues) => logIn(credentials),
         signUp: (credentials: SignUpValues) => signUp(credentials),
+        logout: () => logout(),
       }}
     >
       {children}

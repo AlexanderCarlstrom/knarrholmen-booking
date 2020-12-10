@@ -1,13 +1,15 @@
+import { Redirect, Route, RouteComponentProps, Switch, withRouter } from 'react-router-dom';
 import { Layout } from 'antd';
 import 'antd/dist/antd.css';
 import React from 'react';
-import { Redirect, Route, RouteComponentProps, Switch, withRouter } from 'react-router-dom';
-import './App.scss';
+
 import Activities from './components/Activities/Activities';
-import Auth from './components/Auth/Auth';
-import Footer from './components/Footer/Footer';
-import Home from './components/Home/Home';
 import Navbar from './components/Navbar/Navbar';
+import Footer from './components/Footer/Footer';
+import Logout from './components/Auth/Logout';
+import Auth from './components/Auth/Auth';
+import Home from './components/Home/Home';
+import './App.scss';
 
 const { Content } = Layout;
 
@@ -20,6 +22,7 @@ const App = (props: RouteComponentProps) => {
           <Route exact path="/" component={Home} />
           <Route path="/activities" component={Activities} />
           <Route path="/auth" component={Auth} />
+          <Route path="/logout" component={Logout} />
           <Route render={() => <Redirect exact to="/" />} />
         </Switch>
       </Content>

@@ -3,7 +3,7 @@ $padding: 40px;
 // auth container styles
 .container {
   width: 100vw;
-  height: 100vh;
+  min-height: 100vh;
   padding: $padding;
 
   @media screen and (max-width: 576px) {
@@ -12,7 +12,8 @@ $padding: 40px;
 
   .content {
     width: 100%;
-    height: calc(100vh - 2 * #{$padding});
+    height: 100%;
+    //min-height: calc(100vh - 2 * #{$padding});
     background-color: #fff;
     padding: 24px;
     position: relative;
@@ -50,7 +51,14 @@ $padding: 40px;
       .form {
         margin-top: 40px;
 
+        .name-fields {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 20px;
+        }
+
         .submit-btn {
+          margin-top: 20px;
           width: 100%;
         }
       }

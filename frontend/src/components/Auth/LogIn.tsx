@@ -6,12 +6,12 @@ import { AxiosError } from 'axios';
 import 'antd/dist/antd.css';
 import * as Yup from 'yup';
 
-import { ApiResponse, UserResponse } from '../../types/ApiReponse';
+import { ApiResponse } from '../../types/ApiReponse';
 import FormCheckbox from '../Shared/FormCheckbox/FormCheckbox';
 import { FormInput } from '../Shared/FormInput/FormInput';
 import FormErrors from '../Shared/FormErrors/FormErrors';
-import AuthService from '../../services/auth.service';
 import './Auth.scss';
+import { useAuth } from '../../context/AuthContext';
 
 const { Text, Link } = Typography;
 
@@ -24,7 +24,6 @@ type FormValues = {
 const LogInSchema = Yup.object().shape({
   email: Yup.string().email('Please enter a valid email address').required('Please enter your email address'),
   password: Yup.string()
-    .min(6, 'Your password must be at least 6 characters long')
     .max(255, 'Your password cannot be longer than 255 characters')
     .required('Please enter your password'),
   remember: Yup.bool(),
@@ -42,14 +41,14 @@ const LogIn = () => {
   const [errors, setErrors] = useState([]);
   const [showErrors, setShowErrors] = useState(false);
   const history = useHistory();
+  const { logIn } = useAuth();
 
   const submit = (credentials: FormValues) => {
-    // set error and loading
     setErrorValues('', false);
     setLoading(true);
 
-    AuthService.login(credentials)
-      .then((response: UserResponse) => {
+    logIn(credentials)
+      .then((response: ApiResponse) => {
         if (response.success) {
           message.success('Successfully logged in');
           setTimeout(() => history.push('/'), 700);
@@ -66,6 +65,7 @@ const LogIn = () => {
   };
 
   const setErrorValues = (title: string, show: boolean, errors: string[] = []) => {
+    if (!title) title = 'Could not log in user, please try again later';
     setErrorTitle(title);
     setErrors(errors);
     setShowErrors(show);

@@ -6,10 +6,11 @@ $background: rgba(#fff, 0.8);
   display: flex;
   background: #fff;
   width: 100%;
+  justify-content: space-between;
+  align-items: center;
 
-  &.mobile {
-    justify-content: space-between;
-    align-items: center;
+  &.mobile .brand {
+    margin: 0 2rem 0 1rem;
   }
 
   .brand {
@@ -17,7 +18,9 @@ $background: rgba(#fff, 0.8);
     font-family: 'Roboto Condensed', sans-serif;
     color: #000;
     font-size: 2rem;
-    margin-right: 2rem;
+    margin: 0 2rem 0 0;
+
+
   }
 
   .navigation {
@@ -31,24 +34,20 @@ $background: rgba(#fff, 0.8);
       margin-right: 1rem;
     }
   }
-}
 
-.drawer {
-  .ant-menu-item {
-    // text-align: right;
-    padding-right: 24px;
-    padding-left: 16px;
+  .drawer-btn {
+    position: absolute;
+    left: 16px;
+    top: 16px;
+  }
 
-    &:after {
-      right: auto;
-      left: 0;
-    }
+  .user-btn {
+    position: absolute;
+    right: 16px;
+    top: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
   }
 }
-
-// make active and hover effects on top
-//.navbar.ant-menu-horizontal>.ant-menu-item-selected,
-//.navbar.ant-menu-horizontal>.ant-menu-submenu-open {
-//  border-top:2px solid #1890ff;
-//  border-bottom:2px solid transparent
-//}
