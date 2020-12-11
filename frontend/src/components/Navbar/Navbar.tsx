@@ -47,7 +47,7 @@ const DesktopMenu = ({ pathName }: MenuProps) => {
           {user === null ? (
             <div className="buttons">
               <Button type="primary" ghost className="button">
-                <Link to="/auth/sign-in">Sign In</Link>
+                <Link to="/auth/login">Log In</Link>
               </Button>
               <Button type="primary" className="button">
                 <Link to="/auth/sign-up">Sign Up</Link>
@@ -90,7 +90,7 @@ const MobileMenu = ({ pathName }: MenuProps) => {
         {user === null && (
           <Menu mode="inline" className="drawer-menu">
             <Menu.Item>
-              <Link to="/auth/sign-in">Sign In</Link>
+              <Link to="/auth/login">Log In</Link>
             </Menu.Item>
             <Menu.Item>
               <Link to="/auth/sign-up">Sign Up</Link>
@@ -116,7 +116,7 @@ const UserDropdown = ({ user }: UserDropdownProps) => {
 
   return (
     <Dropdown overlay={dropdownUserMenu} arrow trigger={['hover', 'click']} placement="bottomRight">
-      <Button className="user-btn">
+      <Button className="user-btn" type="primary" ghost>
         {createUserDisplayName(user.firstName)}
         <DownOutlined />
       </Button>

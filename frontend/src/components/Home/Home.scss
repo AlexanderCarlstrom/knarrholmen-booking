@@ -12,8 +12,8 @@
     width: 100%;
     height: 50%;
     grid-area: first;
-    background: url('../../assets/knarrholmen.png');
     background-size: cover;
+    background: url('../../assets/knarrholmen.png') center;
     flex: 1 1 auto;
 
     .content {

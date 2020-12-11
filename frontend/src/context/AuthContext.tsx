@@ -3,7 +3,7 @@ import { AxiosResponse } from 'axios';
 
 import { ContainterProps } from '../types/ContainterProps';
 import { ApiResponse } from '../types/ApiReponse';
-import { privateFetch, publicFetch } from '../utils/axios';
+import { publicFetch } from '../utils/axios';
 
 const AuthContext = React.createContext(null);
 

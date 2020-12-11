@@ -3,7 +3,7 @@ import { Layout } from 'antd';
 import 'antd/dist/antd.css';
 import React from 'react';
 
-import Activities from './components/Activities/Activities';
+import { Activities } from './components/Activities/Activities';
 import Navbar from './components/Navbar/Navbar';
 import Footer from './components/Footer/Footer';
 import Logout from './components/Auth/Logout';

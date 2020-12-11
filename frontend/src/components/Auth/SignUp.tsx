@@ -2,17 +2,15 @@ import { Link as RouterLink, useHistory } from 'react-router-dom';
 import { Form as FormikForm, Field, Formik } from 'formik';
 import { Form, Button, Typography, message } from 'antd';
 import React, { useState } from 'react';
-import { AxiosError } from 'axios';
+import { AxiosError, AxiosResponse } from 'axios';
 import 'antd/dist/antd.css';
 import * as Yup from 'yup';
 
-import { ApiResponse } from '../../types/ApiReponse';
-import FormCheckbox from '../Shared/FormCheckbox/FormCheckbox';
 import { FormInput } from '../Shared/FormInput/FormInput';
 import FormErrors from '../Shared/FormErrors/FormErrors';
-import './Auth.scss';
+import { ApiResponse } from '../../types/ApiReponse';
 import { useAuth } from '../../context/AuthContext';
-import { FormikHelpers } from 'formik/dist/types';
+import './Auth.scss';
 
 const { Text, Link } = Typography;
 
@@ -67,12 +65,12 @@ const SignUp = () => {
     setLoading(true);
 
     signUp(credentials)
-      .then((response: ApiResponse) => {
-        if (response.success) {
+      .then((response: AxiosResponse<ApiResponse>) => {
+        if (response.data.success) {
           message.success('Successfully registered user');
           setTimeout(() => history.push('/auth/login'), 700);
         } else {
-          setErrorValues(response.message, true, response.errors);
+          setErrorValues(response.data.message, true, response.data.errors);
         }
         setLoading(false);
       })

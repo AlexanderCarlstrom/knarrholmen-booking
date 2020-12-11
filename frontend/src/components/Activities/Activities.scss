@@ -1,0 +1,105 @@
+@import '../../variables.scss';
+
+.activities {
+  display: flex;
+  min-height: $trimmedHeight;
+  flex-direction: column;
+
+  .activities-header {
+    .inner {
+      padding: 40px 20px;
+
+      .inline-form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        .search-field {
+          width: 100%;
+        }
+
+        .search-btn {
+          width: 100%;
+        }
+
+        @media (min-width: $sm) {
+          flex-direction: row;
+
+          .search-field {
+            flex: 1;
+            margin-right: 30px;
+          }
+
+          .search-btn {
+            width: auto;
+          }
+        }
+      }
+    }
+  }
+
+  .activities-content {
+    background: #fff;
+    flex: 1 0;
+
+    .list {
+      display: flex;
+      flex-direction: column;
+      padding: 24px 0;
+
+      .activity {
+        padding: 20px;
+        display: flex;
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+
+        .activity-img {
+          width: 120px;
+          height: 120px;
+        }
+
+        .activity-content {
+          margin-left: 20px;
+          position: relative;
+          flex: 1;
+
+          .title {
+            margin-bottom: 0;
+          }
+
+          .info {
+            list-style-type: none;
+            padding-left: 0;
+          }
+
+          .price {
+            position: absolute;
+            top: 0;
+            right: 0;
+          }
+
+          .activity-btn {
+            width: 100%;
+
+            @media (min-width: $sm) {
+              width: auto;
+              position: absolute;
+              bottom: 0;
+              right: 0;
+            }
+          }
+
+          .icon-margin {
+            margin-right: 5px;
+          }
+        }
+      }
+    }
+  }
+
+  .activities-container {
+    width: 100%;
+    max-width: 720px;
+    margin: auto;
+  }
+}

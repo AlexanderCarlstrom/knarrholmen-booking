@@ -14,7 +14,7 @@ const Home = () => {
         <div className="content">
           <div className="search-container">
             <Input.Search
-              placeholder="Search activities"
+              placeholder="Find activities"
               onSearch={search}
               enterButton="Search"
               size="large"

@@ -17,12 +17,12 @@ const Auth = () => {
   };
 
   return (
-    <div className="container">
-      <div className="content">
+    <div className="auth-container">
+      <div className="auth-content">
         <Button className="back-btn" onClick={goHome} size="large" icon={<ArrowLeftOutlined />} />
         <div className="form-container">
           <Switch>
-            <Route exact path={`${path}/sign-in`} component={LogIn} />
+            <Route exact path={`${path}/login`} component={LogIn} />
             <Route exact path={`${path}/sign-up`} component={SignUp} />
             <Route render={() => <Redirect exact to="/" />} />
           </Switch>
