@@ -2,8 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using api.Contexts;
 using api.Models;
-using booking_api.Services;
+using api.Services;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,12 +16,12 @@ namespace booking_api.Controllers
     public class ActivityController : ControllerBase
     {
         private readonly IActivityService _activityService;
-        private readonly BookingContext _bookingContext;
+        private readonly BookingDbContext _bookingDbContext;
 
-        public ActivityController(IActivityService activityService, BookingContext bookingContext)
+        public ActivityController(IActivityService activityService, BookingDbContext bookingDbContext)
         {
             _activityService = activityService;
-            _bookingContext = bookingContext;
+            _bookingDbContext = bookingDbContext;
         }
         
         [HttpGet]

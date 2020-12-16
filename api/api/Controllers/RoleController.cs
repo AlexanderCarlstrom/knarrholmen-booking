@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 using api.Models;
-using booking_api.Services;
+using api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;

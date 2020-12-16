@@ -11,5 +11,10 @@ namespace api.Entities
         [PersonalData] public string LastName { get; set; }
         [JsonIgnore] public List<RefreshToken> RefreshTokens { get; set; }
         [NotMapped] public IEnumerable<string> Roles { get; set; }
+
+        public User()
+        {
+            RefreshTokens = new List<RefreshToken>();
+        }
     }
 }

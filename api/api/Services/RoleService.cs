@@ -3,8 +3,14 @@ using System.Threading.Tasks;
 using api.Models;
 using Microsoft.AspNetCore.Identity;
 
-namespace booking_api.Services
+namespace api.Services
 {
+    public interface IRoleService
+    {
+        Task<Response> CreateRoleAsync(string name);
+        Task<Response> DeleteRoleAsync(string id);
+    }
+
     public class RoleService : IRoleService
     {
         private readonly RoleManager<IdentityRole> _roleManager;

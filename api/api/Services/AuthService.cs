@@ -2,26 +2,34 @@ using System;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
+using api.Contexts;
 using api.Models;
 using api.Entities;
-using booking_api.Services;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
 
 namespace api.Services
 {
+    public interface IAuthService
+    {
+        Task<ApiResponse> RegisterUserAsync(RegisterModel model);
+        Task<ApiResponse> LoginUserAsync(LoginModel model);
+        Task<ApiResponse> ConfirmEmailAsync(ConfirmEmailModel model);
+        Task<ApiResponse> ForgetPasswordAsync(ForgetPasswordModel model);
+        Task<ApiResponse> ResetPasswordAsync(ResetPasswordModel model);
+    }
+
     public class AuthService : IAuthService
     {
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
-        private readonly BookingContext _bookingContext;
+        private readonly BookingDbContext _bookingDbContext;
 
         public AuthService(UserManager<User> userManager, SignInManager<User> signInManager,
-            BookingContext bookingContext)
+            BookingDbContext bookingDbContext)
         {
             _userManager = userManager;
             _signInManager = signInManager;
-            _bookingContext = bookingContext;
+            _bookingDbContext = bookingDbContext;
         }
 
 
@@ -75,8 +83,8 @@ namespace api.Services
             user.Roles = await _userManager.GetRolesAsync(user);
             var token = CreateRefreshToken();
             user.RefreshTokens.Add(token);
-            _bookingContext.Update(user);
-            _bookingContext.SaveChanges();
+            _bookingDbContext.Update(user);
+            await _bookingDbContext.SaveChangesAsync();
 
             return new ApiResponse(user, token);
         }
@@ -102,11 +110,12 @@ namespace api.Services
             var rnd = new byte[32];
             using var generator = new RNGCryptoServiceProvider();
             generator.GetBytes(rnd);
-            return new RefreshToken
+            var token = new RefreshToken
             {
                 Token = Convert.ToBase64String(rnd),
                 ExpiresAt = DateTime.Now.AddDays(30)
             };
+            return token;
         }
     }
 }

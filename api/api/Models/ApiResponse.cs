@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using api.Entities;
 using Newtonsoft.Json;
@@ -7,11 +8,11 @@ namespace api.Models
     public class ApiResponse
     {
         public bool Success { get; private set; }
-        public string Message { get; private set; }
-        [JsonIgnore] public int Status { get; private set; }
-        public IEnumerable<string> Errors { get; private set; }
-        public User User { get; private set; }
-        [JsonIgnore] public RefreshToken RefreshToken { get; private set; }
+        public string Message { get; set; }
+        [JsonIgnore] public int Status { get; set; }
+        public IEnumerable<string> Errors { get; set; }
+        public User User { get; set; }
+        [JsonIgnore] public RefreshToken RefreshToken { get; set; }
 
         /// <summary>
         /// base constructor

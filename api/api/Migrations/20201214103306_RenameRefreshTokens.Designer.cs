@@ -11,8 +11,8 @@ using api.Models;
 namespace api.Migrations
 {
     [DbContext(typeof(BookingDbContext))]
-    [Migration("20201202162134_addedRefreshTokens")]
-    partial class addedRefreshTokens
+    [Migration("20201214103306_RenameRefreshTokens")]
+    partial class RenameRefreshTokens
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -153,7 +153,7 @@ namespace api.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("api.Models.Activity", b =>
+            modelBuilder.Entity("api.Entities.Activity", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -185,7 +185,7 @@ namespace api.Migrations
                     b.ToTable("Activities");
                 });
 
-            modelBuilder.Entity("api.Models.RefreshToken", b =>
+            modelBuilder.Entity("api.Entities.RefreshToken", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -203,10 +203,10 @@ namespace api.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("RefreshToken");
+                    b.ToTable("RefreshTokens");
                 });
 
-            modelBuilder.Entity("api.Models.User", b =>
+            modelBuilder.Entity("api.Entities.User", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -288,7 +288,7 @@ namespace api.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("api.Models.User", null)
+                    b.HasOne("api.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -297,7 +297,7 @@ namespace api.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("api.Models.User", null)
+                    b.HasOne("api.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -312,7 +312,7 @@ namespace api.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("api.Models.User", null)
+                    b.HasOne("api.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -321,21 +321,21 @@ namespace api.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("api.Models.User", null)
+                    b.HasOne("api.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("api.Models.RefreshToken", b =>
+            modelBuilder.Entity("api.Entities.RefreshToken", b =>
                 {
-                    b.HasOne("api.Models.User", null)
+                    b.HasOne("api.Entities.User", null)
                         .WithMany("RefreshTokens")
                         .HasForeignKey("UserId");
                 });
 
-            modelBuilder.Entity("api.Models.User", b =>
+            modelBuilder.Entity("api.Entities.User", b =>
                 {
                     b.Navigation("RefreshTokens");
                 });

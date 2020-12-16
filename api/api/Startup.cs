@@ -1,8 +1,7 @@
 using System;
+using api.Contexts;
 using api.Entities;
-using api.Models;
 using api.Services;
-using booking_api.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -24,12 +23,12 @@ namespace api
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<BookingContext>(options =>
+            services.AddDbContext<BookingDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("KnarrholmenBooking")));
 
             services.AddIdentity<User, IdentityRole>()
                 .AddRoles<IdentityRole>()
-                .AddEntityFrameworkStores<BookingContext>()
+                .AddEntityFrameworkStores<BookingDbContext>()
                 .AddDefaultTokenProviders();
 
             services.Configure<IdentityOptions>(options =>
@@ -63,7 +62,7 @@ namespace api
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment() || env.IsEnvironment("Local"))
+            if (env.IsDevelopment() || env.IsEnvironment("local"))
             {
                 app.UseDeveloperExceptionPage();
             }

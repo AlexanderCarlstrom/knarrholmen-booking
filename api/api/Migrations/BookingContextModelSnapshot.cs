@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using api.Models;
+using api.Contexts;
 
 namespace api.Migrations
 {
-    [DbContext(typeof(BookingContext))]
+    [DbContext(typeof(BookingDbContext))]
     partial class BookingContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
@@ -150,29 +150,23 @@ namespace api.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("api.Models.Activity", b =>
+            modelBuilder.Entity("api.Entities.Activity", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("CloseTime")
-                        .HasColumnType("int");
-
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("MaxMinutes")
+                    b.Property<int>("MaxTime")
                         .HasColumnType("int");
 
-                    b.Property<int>("MinMinutes")
+                    b.Property<int>("MinTime")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("OpenTime")
-                        .HasColumnType("int");
 
                     b.Property<int>("Price")
                         .HasColumnType("int");
@@ -182,7 +176,28 @@ namespace api.Migrations
                     b.ToTable("Activities");
                 });
 
-            modelBuilder.Entity("api.Models.RefreshToken", b =>
+            modelBuilder.Entity("api.Entities.OpenHours", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ActivityId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("Close")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Open")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ActivityId");
+
+                    b.ToTable("OpenHours");
+                });
+
+            modelBuilder.Entity("api.Entities.RefreshToken", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -200,10 +215,10 @@ namespace api.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("RefreshToken");
+                    b.ToTable("RefreshTokens");
                 });
 
-            modelBuilder.Entity("api.Models.User", b =>
+            modelBuilder.Entity("api.Entities.User", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -285,7 +300,7 @@ namespace api.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("api.Models.User", null)
+                    b.HasOne("api.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -294,7 +309,7 @@ namespace api.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("api.Models.User", null)
+                    b.HasOne("api.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -309,7 +324,7 @@ namespace api.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("api.Models.User", null)
+                    b.HasOne("api.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -318,21 +333,30 @@ namespace api.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("api.Models.User", null)
+                    b.HasOne("api.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("api.Models.RefreshToken", b =>
+            modelBuilder.Entity("api.Entities.OpenHours", b =>
                 {
-                    b.HasOne("api.Models.User", null)
+                    b.HasOne("api.Entities.Activity", "Activity")
+                        .WithMany()
+                        .HasForeignKey("ActivityId");
+
+                    b.Navigation("Activity");
+                });
+
+            modelBuilder.Entity("api.Entities.RefreshToken", b =>
+                {
+                    b.HasOne("api.Entities.User", null)
                         .WithMany("RefreshTokens")
                         .HasForeignKey("UserId");
                 });
 
-            modelBuilder.Entity("api.Models.User", b =>
+            modelBuilder.Entity("api.Entities.User", b =>
                 {
                     b.Navigation("RefreshTokens");
                 });
