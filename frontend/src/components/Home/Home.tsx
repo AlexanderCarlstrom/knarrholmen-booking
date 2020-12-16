@@ -1,11 +1,12 @@
 import { Typography, Input } from 'antd';
 import React from 'react';
+import { RouteComponentProps } from 'react-router-dom';
 
 import './Home.scss';
 
-const Home = () => {
+const Home = ({ history }: RouteComponentProps) => {
   const search = (search: string) => {
-    console.log(search);
+    history.push(`/activities/${search}`);
   };
 
   return (

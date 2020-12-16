@@ -16,17 +16,17 @@ const { Content } = Layout;
 const App = (props: RouteComponentProps) => {
   return (
     <Layout className="app">
-      {props.location.pathname !== '/auth/sign-in' && props.location.pathname !== '/auth/sign-up' ? <Navbar /> : null}
+      {props.location.pathname !== '/auth/login' && props.location.pathname !== '/auth/sign-up' ? <Navbar /> : null}
       <Content className="content">
         <Switch>
           <Route exact path="/" component={Home} />
-          <Route path="/activities" component={Activities} />
+          <Route path="/activities/:search?" component={Activities} />
           <Route path="/auth" component={Auth} />
           <Route path="/logout" component={Logout} />
           <Route render={() => <Redirect exact to="/" />} />
         </Switch>
       </Content>
-      {props.location.pathname !== '/auth/sign-in' && props.location.pathname !== '/auth/sign-up' ? <Footer /> : null}
+      {props.location.pathname !== '/auth/login' && props.location.pathname !== '/auth/sign-up' ? <Footer /> : null}
     </Layout>
   );
 };

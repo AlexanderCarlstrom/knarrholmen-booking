@@ -20,7 +20,7 @@ const AuthProvider = ({ children }: ContainterProps) => {
         }
         return data;
       })
-      .catch((err) => err.response.data);
+      .catch((err) => err);
   };
 
   const signUp = (credentials: SignUpValues) => publicFetch.post<ApiResponse>('auth/register', credentials);

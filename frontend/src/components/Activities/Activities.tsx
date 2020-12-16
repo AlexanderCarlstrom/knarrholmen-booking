@@ -1,17 +1,40 @@
 import { EnvironmentOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Typography, Image, Divider } from 'antd';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { fallbackImage } from '../../utils/fallbackImage';
 import { activities } from '../../fakeData';
 import './Activities.scss';
+import { RouteComponentProps } from 'react-router-dom';
 
 const { Title, Text } = Typography;
 
-const Activities = () => {
-  const list = activities.map((activity) => (
-    <>
-      <div className="activity" key={activity.id}>
+type Params = {
+  search: string;
+};
+
+const Activities = ({ match }: RouteComponentProps<Params>) => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchResult, setSearchResult] = useState([]);
+  let mounted = false;
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+  };
+
+  useEffect(() => {
+    if (!mounted) {
+      const { search } = match.params;
+      if (search) setSearchTerm(search);
+      mounted = true;
+    }
+    const result = activities.filter((activity) => activity.name.toLowerCase().includes(searchTerm.toLowerCase()));
+    setSearchResult(result);
+  }, [searchTerm]);
+
+  const list = searchResult.map((activity) => (
+    <div key={activity.id}>
+      <div className="activity">
         <Image src={activity.img} fallback={fallbackImage} className="activity-img" />
         <div className="activity-content">
           <Title level={4} className="title">
@@ -40,7 +63,7 @@ const Activities = () => {
         </div>
       </div>
       <Divider />
-    </>
+    </div>
   ));
 
   return (
@@ -51,16 +74,15 @@ const Activities = () => {
             <Title level={2} className="title">
               Find activities
             </Title>
-            <Form onFinish={onSearch} className="inline-form">
-              <Form.Item className="search-field">
-                <Input name="search" placeholder="Find activities" size="large" />
-              </Form.Item>
-              <Form.Item className="search-btn">
-                <Button type="primary" size="large">
-                  SEARCH
-                </Button>
-              </Form.Item>
-            </Form>
+            <Form.Item className="search-field">
+              <Input
+                name="search"
+                placeholder="Find activities"
+                size="large"
+                value={searchTerm}
+                onChange={handleChange}
+              />
+            </Form.Item>
           </div>
         </div>
       </div>
@@ -73,8 +95,4 @@ const Activities = () => {
   );
 };
 
-const onSearch = (search: string) => {
-  console.log(search);
-};
-
-export { Activities, onSearch };
+export { Activities };
