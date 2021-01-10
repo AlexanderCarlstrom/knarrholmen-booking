@@ -1,7 +1,8 @@
 using System;
 using System.Threading.Tasks;
-using api.Models;
+using api.Contracts.Requests;
 using api.Services;
+using api.Contracts;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -22,15 +23,15 @@ namespace api.Controllers
 
         [HttpPost]
         [Route("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterModel model)
+        public async Task<IActionResult> Register([FromBody] RegisterRequest model)
         {
             var response = await _authService.RegisterUserAsync(model);
-            return StatusCode(response.Status, response);
+            return StatusCode(response.StatusCode, response);
         }
 
         [HttpPost]
         [Route("login")]
-        public async Task<IActionResult> Login([FromBody] LoginModel model)
+        public async Task<IActionResult> Login([FromBody] LoginRequest model)
         {
             var response = await _authService.LoginUserAsync(model);
             if (response.Success)
@@ -38,14 +39,23 @@ namespace api.Controllers
                 SetRefreshTokenCookie(response.RefreshToken.Token, response.RefreshToken.ExpiresAt);
             }
 
-            return StatusCode(response.Status, response);
+            return StatusCode(response.StatusCode, response);
+        }
+
+        [HttpPost]
+        [Route("logout")]
+        public async Task<IActionResult> Logout(string userId)
+        {
+            var token = Request.Cookies[Authorization.RefreshTokenCookieName];
+            var response =
+                await _authService.LogoutUserAsync(new LogoutRequest {UserId = userId, RefreshToken = token});
+
+            return StatusCode(response.StatusCode, response);
         }
 
         private void SetRefreshTokenCookie(string token, DateTime expires)
         {
-            var cookieOptions = new CookieOptions();
-            cookieOptions.HttpOnly = true;
-            cookieOptions.Expires = expires;
+            var cookieOptions = new CookieOptions {HttpOnly = true, Expires = expires, IsEssential = true};
             Response.Cookies.Append("refresh-token", token, cookieOptions);
         }
     }

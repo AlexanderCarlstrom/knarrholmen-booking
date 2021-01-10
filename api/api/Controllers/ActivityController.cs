@@ -1,14 +1,12 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using api.Contexts;
-using api.Models;
 using api.Services;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
-namespace booking_api.Controllers
+namespace api.Controllers
 {
     [Route("activities")]
     [ApiController]

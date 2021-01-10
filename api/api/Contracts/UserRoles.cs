@@ -1,6 +1,4 @@
-using System;
-
-namespace api.Constants
+namespace api.Contracts
 {
     public enum UserRoles
     {

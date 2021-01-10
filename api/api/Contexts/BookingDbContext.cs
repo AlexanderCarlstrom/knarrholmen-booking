@@ -10,6 +10,7 @@ namespace api.Contexts
         public DbSet<Activity> Activities { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
         public DbSet<OpenHours> OpenHours { get; set; }
+        public DbSet<Booking> Bookings { get; set; }
 
         public BookingDbContext(DbContextOptions<BookingDbContext> options) : base(options)
         {

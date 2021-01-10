@@ -20,6 +20,7 @@ namespace api
         }
 
         public IConfiguration Configuration { get; }
+        private IWebHostEnvironment _env { get; set; }
 
         public void ConfigureServices(IServiceCollection services)
         {
@@ -62,6 +63,8 @@ namespace api
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            _env = env;
+            
             if (env.IsDevelopment() || env.IsEnvironment("local"))
             {
                 app.UseDeveloperExceptionPage();

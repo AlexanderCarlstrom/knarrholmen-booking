@@ -49,14 +49,14 @@ namespace api.Migrations
                         new
                         {
                             Id = "037a87d5-2f44-474c-b494-295faeac310f",
-                            ConcurrencyStamp = "ec8b9b04-fda5-4b04-9922-23b52fd405a6",
+                            ConcurrencyStamp = "56fbe638-7289-496d-830c-ccc8a65aa76d",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
                             Id = "b8973d7c-483d-4a3e-9d1b-c04a4d809323",
-                            ConcurrencyStamp = "5a59aeb5-9486-4041-8d5d-c0179cd81fd6",
+                            ConcurrencyStamp = "15b0b65c-40a6-4a38-bf51-7891af9578ef",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -178,33 +178,62 @@ namespace api.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Description")
+                    b.Property<string>("Address")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("MaxTime")
-                        .HasColumnType("int");
-
-                    b.Property<int>("MinTime")
-                        .HasColumnType("int");
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OpenHoursId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("Price")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("OpenHoursId");
+
                     b.ToTable("Activities");
                 });
 
-            modelBuilder.Entity("api.Entities.OpenHours", b =>
+            modelBuilder.Entity("api.Entities.Booking", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ActivityId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("End")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("Payed")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("Start")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ActivityId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Bookings");
+                });
+
+            modelBuilder.Entity("api.Entities.OpenHours", b =>
+                {
+                    b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("Close")
@@ -214,8 +243,6 @@ namespace api.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ActivityId");
 
                     b.ToTable("OpenHours");
                 });
@@ -316,7 +343,7 @@ namespace api.Migrations
                         {
                             Id = "8e3db864-4c10-41d8-8060-b4edb0534fac",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "f4687d2a-7480-4c28-a624-68d50c86b0f7",
+                            ConcurrencyStamp = "8fd00cae-4c5e-4dc7-852d-8eb3dd84a403",
                             Email = "alexander@gmail.com",
                             EmailConfirmed = true,
                             FirstName = "Alexander",
@@ -324,9 +351,9 @@ namespace api.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ALEXANDER@GMAIL.COM",
                             NormalizedUserName = "ALEXANDER@GMAIL.COM",
-                            PasswordHash = "AQAAAAEAACcQAAAAEAYIJ/OMFAgl+f5jmsujfKHPNmlgIabM4xla7sPD+kHpSYDFnRrVGNnxALCnNo3uwQ==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEArXO8ro1q/8W3eWqBMzhuQzzcbkOSGxEcIyH3vlxuHAk2l2+ZBMJFr4OzZIhj3hmQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "5dd932d5-4f44-4dda-8380-faadc97ac391",
+                            SecurityStamp = "f4508cff-116f-4edd-b6aa-16c3b6a459d7",
                             TwoFactorEnabled = false,
                             UserName = "alexander@gmail.com"
                         });
@@ -383,13 +410,28 @@ namespace api.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("api.Entities.OpenHours", b =>
+            modelBuilder.Entity("api.Entities.Activity", b =>
+                {
+                    b.HasOne("api.Entities.OpenHours", "OpenHours")
+                        .WithMany()
+                        .HasForeignKey("OpenHoursId");
+
+                    b.Navigation("OpenHours");
+                });
+
+            modelBuilder.Entity("api.Entities.Booking", b =>
                 {
                     b.HasOne("api.Entities.Activity", "Activity")
-                        .WithMany()
+                        .WithMany("Bookings")
                         .HasForeignKey("ActivityId");
 
+                    b.HasOne("api.Entities.User", "User")
+                        .WithMany("Bookings")
+                        .HasForeignKey("UserId");
+
                     b.Navigation("Activity");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("api.Entities.RefreshToken", b =>
@@ -399,8 +441,15 @@ namespace api.Migrations
                         .HasForeignKey("UserId");
                 });
 
+            modelBuilder.Entity("api.Entities.Activity", b =>
+                {
+                    b.Navigation("Bookings");
+                });
+
             modelBuilder.Entity("api.Entities.User", b =>
                 {
+                    b.Navigation("Bookings");
+
                     b.Navigation("RefreshTokens");
                 });
 #pragma warning restore 612, 618
