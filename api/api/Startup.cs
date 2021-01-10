@@ -1,7 +1,9 @@
 using System;
 using api.Contexts;
+using api.DTOs;
 using api.Entities;
 using api.Services;
+using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -52,10 +54,13 @@ namespace api
                     options => options.WithOrigins(Configuration["CorsOrigin"])
                         .WithHeaders("Access-Control-Allow-Origin", "Content-Type"));
             });
+            
+            services.AddAutoMapper(typeof(Startup));
 
             services.AddScoped<IRoleService, RoleService>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IActivityService, ActivityService>();
+
             services.AddControllers()
                 .AddJsonOptions(options => options.JsonSerializerOptions.IgnoreNullValues = true);
         }

@@ -9,8 +9,8 @@ namespace api.Entities
     {
         [PersonalData] public string FirstName { get; set; }
         [PersonalData] public string LastName { get; set; }
-        [JsonIgnore] public List<RefreshToken> RefreshTokens { get; set; }
-        [JsonIgnore] public List<Booking> Bookings { get; set; }
+        public List<RefreshToken> RefreshTokens { get; set; }
+        public List<Booking> Bookings { get; set; }
         [NotMapped] public IEnumerable<string> Roles { get; set; }
 
         public User()

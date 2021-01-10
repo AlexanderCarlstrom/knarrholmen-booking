@@ -1,15 +1,16 @@
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using api.DTOs;
 using api.Entities;
 
 namespace api.Contracts.Responses
 {
     public class UserResponse : Response
     {
-        public User User { get; set; }
+        public UserDTO User { get; set; }
         [JsonIgnore] public RefreshToken RefreshToken { get; set; }
 
-        public UserResponse(int statusCode, User user, RefreshToken refreshToken)
+        public UserResponse(int statusCode, UserDTO user, RefreshToken refreshToken)
             : base(true, statusCode)
         {
             User = user;

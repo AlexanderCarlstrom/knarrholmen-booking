@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 using api.Contexts;
 using api.Contracts.Requests;
 using api.Contracts.Responses;
+using api.DTOs;
 using api.Entities;
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 
@@ -26,12 +28,14 @@ namespace api.Services
     {
         private readonly UserManager<User> _userManager;
         private readonly BookingDbContext _bookingDbContext;
+        private readonly IMapper _mapper;
 
         public AuthService(UserManager<User> userManager,
-            BookingDbContext bookingDbContext)
+            BookingDbContext bookingDbContext, IMapper mapper)
         {
             _userManager = userManager;
             _bookingDbContext = bookingDbContext;
+            _mapper = mapper;
         }
 
 
@@ -93,8 +97,11 @@ namespace api.Services
             user.RefreshTokens.Add(token);
             _bookingDbContext.Update(user);
             await _bookingDbContext.SaveChangesAsync();
+            
+            // map to user dto
+            var userDto = _mapper.Map<UserDTO>(user);
 
-            return new UserResponse(200, user, token);
+            return new UserResponse(200, userDto, token);
         }
 
         public async Task<Response> LogoutUserAsync(LogoutRequest model)
