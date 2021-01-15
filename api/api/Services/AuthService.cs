@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using api.Contexts;
+using api.Contracts;
 using api.Contracts.Requests;
 using api.Contracts.Responses;
 using api.DTOs;
@@ -11,6 +12,7 @@ using api.Entities;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 
 namespace api.Services
 {
@@ -18,6 +20,7 @@ namespace api.Services
     {
         Task<Response> RegisterUserAsync(RegisterRequest model);
         Task<UserResponse> LoginUserAsync(LoginRequest model);
+        Task<UserResponse> LoginWithTokenASync(string refreshToken);
         Task<Response> LogoutUserAsync(LogoutRequest model);
         Task<Response> ConfirmEmailAsync(ConfirmEmailRequest model);
         Task<Response> ForgetPasswordAsync([EmailAddress] string email);
@@ -27,13 +30,15 @@ namespace api.Services
     public class AuthService : IAuthService
     {
         private readonly UserManager<User> _userManager;
+        private readonly SignInManager<User> _signInManager;
         private readonly BookingDbContext _bookingDbContext;
         private readonly IMapper _mapper;
 
-        public AuthService(UserManager<User> userManager,
+        public AuthService(UserManager<User> userManager, SignInManager<User> signInManager,
             BookingDbContext bookingDbContext, IMapper mapper)
         {
             _userManager = userManager;
+            _signInManager = signInManager;
             _bookingDbContext = bookingDbContext;
             _mapper = mapper;
         }
@@ -60,7 +65,7 @@ namespace api.Services
 
             if (result.Succeeded)
             {
-                await _userManager.AddToRoleAsync(newUser, "User");
+                await _userManager.AddToRoleAsync(newUser, UserRoles.User);
                 // TODO
                 // Send confirmation email
 
@@ -84,24 +89,40 @@ namespace api.Services
             // Check if password is correct
             var passwordCheck = await _userManager.CheckPasswordAsync(user, model.Password);
             if (!passwordCheck) return new UserResponse(400, "Wrong email or password");
-            
+
             // Check if email has been confirmed
             var confirmed = await _userManager.IsEmailConfirmedAsync(user);
             if (!confirmed) return new UserResponse(403, "Email must been confirmed");
 
+            await _signInManager.SignInAsync(user, model.Remember);
+
             // Get user roles
             user.Roles = await _userManager.GetRolesAsync(user);
 
-            // Create refresh token
-            var token = CreateRefreshToken();
-            user.RefreshTokens.Add(token);
-            _bookingDbContext.Update(user);
-            await _bookingDbContext.SaveChangesAsync();
-            
             // map to user dto
             var userDto = _mapper.Map<UserDTO>(user);
 
+            if (!model.Remember) return new UserResponse(200, userDto);
+            
+            // Create refresh token
+            var token = new RefreshToken(DateTime.Now.AddDays(30));
+            user.RefreshTokens.Add(token);
+            _bookingDbContext.Update(user);
+            await _bookingDbContext.SaveChangesAsync();
+
             return new UserResponse(200, userDto, token);
+
+        }
+
+        public async Task<UserResponse> LoginWithTokenASync(string refreshToken)
+        {
+            var token = await _bookingDbContext.RefreshTokens.FindAsync(refreshToken);
+            if (token == null) return new UserResponse(401, "invalid refresh token");
+            var user = await _userManager.FindByIdAsync(token.UserId);
+            await _signInManager.SignInAsync(user, true);
+            
+            var userDto = _mapper.Map<UserDTO>(user);
+            return new UserResponse(200, userDto);
         }
 
         public async Task<Response> LogoutUserAsync(LogoutRequest model)
@@ -128,20 +149,6 @@ namespace api.Services
         public Task<Response> ResetPasswordAsync(ResetPasswordRequest model)
         {
             throw new System.NotImplementedException();
-        }
-
-        // helper methods
-        private static RefreshToken CreateRefreshToken()
-        {
-            var rnd = new byte[32];
-            using var generator = new RNGCryptoServiceProvider();
-            generator.GetBytes(rnd);
-            var token = new RefreshToken
-            {
-                Token = Convert.ToBase64String(rnd),
-                ExpiresAt = DateTime.Now.AddDays(30)
-            };
-            return token;
         }
     }
 }

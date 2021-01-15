@@ -1,16 +1,21 @@
 using System;
 using api.Contexts;
+using api.Contracts;
 using api.DTOs;
 using api.Entities;
 using api.Services;
 using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Serilog;
+using Serilog.Events;
 
 namespace api
 {
@@ -18,14 +23,18 @@ namespace api
     {
         public Startup(IConfiguration configuration)
         {
+            Log.Logger = new LoggerConfiguration().MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+                .MinimumLevel.Override("System", LogEventLevel.Warning).WriteTo.Console()
+                .CreateLogger();
             Configuration = configuration;
         }
 
         public IConfiguration Configuration { get; }
-        private IWebHostEnvironment _env { get; set; }
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddLogging(loggingBuilder => loggingBuilder.AddSerilog(dispose: true));
+
             services.AddDbContext<BookingDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("KnarrholmenBooking")));
 
@@ -43,9 +52,11 @@ namespace api
 
             services.ConfigureApplicationCookie(options =>
             {
-                options.Cookie.Name = "access-token";
-                options.ExpireTimeSpan = TimeSpan.FromMinutes(20);
+                options.Cookie.Name = Authorization.AccessTokenCookieName;
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(1);
                 options.Cookie.HttpOnly = true;
+                options.LoginPath = "/auth/unauthorized";
+                options.AccessDeniedPath = "/auth/access-denied";
             });
 
             services.AddCors(c =>
@@ -54,7 +65,7 @@ namespace api
                     options => options.WithOrigins(Configuration["CorsOrigin"])
                         .WithHeaders("Access-Control-Allow-Origin", "Content-Type"));
             });
-            
+
             services.AddAutoMapper(typeof(Startup));
 
             services.AddScoped<IRoleService, RoleService>();
@@ -66,10 +77,10 @@ namespace api
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {
-            _env = env;
-            
+            loggerFactory.AddSerilog();
+
             if (env.IsDevelopment() || env.IsEnvironment("local"))
             {
                 app.UseDeveloperExceptionPage();
@@ -80,6 +91,8 @@ namespace api
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.UseMiddleware<SerilogRequestMiddleware>();
 
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }

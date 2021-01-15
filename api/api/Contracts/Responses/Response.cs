@@ -18,7 +18,7 @@ namespace api.Contracts.Responses
             Success = success;
             StatusCode = statusCode;
         }
-        
+
         /// <summary>
         /// Basic response with message
         /// </summary>
@@ -33,17 +33,13 @@ namespace api.Contracts.Responses
         /// Basic error response
         /// </summary>
         public Response(int statusCode, string message)
+            : this(true, statusCode, message)
         {
-            Success = false;
-            StatusCode = statusCode;
-            Message = message;
         }
 
         public Response(int statusCode, string message, IEnumerable<string> errors)
+            : this(false, statusCode, message)
         {
-            Success = false;
-            StatusCode = statusCode;
-            Message = message;
             Errors = errors;
         }
     }

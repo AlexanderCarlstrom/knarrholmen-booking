@@ -1,8 +1,8 @@
 namespace api.Contracts
 {
-    public enum UserRoles
+    public static class UserRoles
     {
-        Admin,
-        User,
+        public const string Admin = "Admin";
+        public const string User = "User";
     }
 }

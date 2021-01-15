@@ -1,11 +1,13 @@
 using System.Threading.Tasks;
+using api.Contracts;
 using api.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace api.Controllers
 {
-    // [Authorize(Roles = "Admin")]
+    [Authorize(Roles = UserRoles.Admin)]
     [Route("roles")]
     [ApiController]
     [EnableCors("AllowOrigin")]

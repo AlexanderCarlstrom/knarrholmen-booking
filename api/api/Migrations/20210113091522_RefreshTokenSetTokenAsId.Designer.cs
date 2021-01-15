@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using api.Contexts;
 
 namespace api.Migrations
 {
     [DbContext(typeof(BookingDbContext))]
-    partial class BookingContextModelSnapshot : ModelSnapshot
+    [Migration("20210113091522_RefreshTokenSetTokenAsId")]
+    partial class RefreshTokenSetTokenAsId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -49,14 +51,14 @@ namespace api.Migrations
                         new
                         {
                             Id = "037a87d5-2f44-474c-b494-295faeac310f",
-                            ConcurrencyStamp = "c88e6174-9713-4bbc-8ac8-1926276793ca",
+                            ConcurrencyStamp = "e484b820-7850-4953-96bb-8b4899ccaf3a",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
                             Id = "b8973d7c-483d-4a3e-9d1b-c04a4d809323",
-                            ConcurrencyStamp = "a0dd9058-46ea-4436-b0c3-a4d250804596",
+                            ConcurrencyStamp = "da0f4638-a6a6-45af-b11c-68838b5e5d66",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -213,6 +215,9 @@ namespace api.Migrations
                     b.Property<DateTime>("End")
                         .HasColumnType("datetime2");
 
+                    b.Property<bool>("Payed")
+                        .HasColumnType("bit");
+
                     b.Property<DateTime>("Start")
                         .HasColumnType("datetime2");
 
@@ -337,7 +342,7 @@ namespace api.Migrations
                         {
                             Id = "8e3db864-4c10-41d8-8060-b4edb0534fac",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "69bc2918-f557-4927-8d75-a66143949bb1",
+                            ConcurrencyStamp = "1f4c85ad-916e-4469-b493-3040c801cf54",
                             Email = "alexander@gmail.com",
                             EmailConfirmed = true,
                             FirstName = "Alexander",
@@ -345,9 +350,9 @@ namespace api.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ALEXANDER@GMAIL.COM",
                             NormalizedUserName = "ALEXANDER@GMAIL.COM",
-                            PasswordHash = "AQAAAAEAACcQAAAAEPbWxJkcHxXatGm72QFeLIE2Xg2YBEAiU9lH1CWZ+1+rBr41OWNcQBm+nXlcAqkhPQ==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEB03Xkgn+Xpd52NP9sWzyd3j089Uy8rWksDiQr+G6lXGERetJGWroWp+4kmmFLtobg==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "21ca651b-5b0c-4860-b24b-120ab7c6c39a",
+                            SecurityStamp = "e41ddc11-4bbd-4e83-aacf-07d31dddc267",
                             TwoFactorEnabled = false,
                             UserName = "alexander@gmail.com"
                         });

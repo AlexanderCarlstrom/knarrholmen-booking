@@ -10,6 +10,11 @@ namespace api.Contracts.Responses
         public UserDTO User { get; set; }
         [JsonIgnore] public RefreshToken RefreshToken { get; set; }
 
+        public UserResponse(int statusCode, UserDTO user)
+            : base(true, statusCode)
+        {
+            User = user;
+        }
         public UserResponse(int statusCode, UserDTO user, RefreshToken refreshToken)
             : base(true, statusCode)
         {

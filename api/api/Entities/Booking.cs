@@ -8,7 +8,6 @@ namespace api.Entities
         [Key] public string Id { get; set; }
         [Required] public DateTime Start { get; set; }
         [Required] public DateTime End { get; set; }
-        public bool Payed { get; set; }
         public string UserId { get; set; }
         public User User { get; set; }
         public string ActivityId { get; set; }
@@ -17,7 +16,6 @@ namespace api.Entities
         public Booking()
         {
             Id = Guid.NewGuid().ToString();
-            Payed = false;
         }
     }
 }

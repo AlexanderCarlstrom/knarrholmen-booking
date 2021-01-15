@@ -2,7 +2,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using api.Contexts;
+using api.Contracts;
 using api.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
@@ -24,20 +26,10 @@ namespace api.Controllers
         
         [HttpGet]
         [Route("test")]
-        public async Task<IActionResult> Test()
+        [Authorize(Roles = UserRoles.Admin)]
+        public IActionResult Test()
         {
-            // var activity = new Activity
-            // {
-            //     Name = "Sauna",
-            //     Price = 100,
-            //     Description = "Test",
-            // };
-            //
-            // await _bookingContext.Activities.AddAsync(activity);
-            // await _bookingContext.SaveChangesAsync();
-            //
-            // var result = await _bookingContext.Activities.FindAsync(activity.Id);
-            return Ok(GetOpeningHours(12, 40));
+            return Ok("Hej");
         }
         
         // helper methods

@@ -10,5 +10,6 @@ namespace api.Contracts.Requests
 
         [Required(ErrorMessage = "Password is required")]
         public string Password { get; set; }
+        public bool Remember { get; set; }
     }
 }
