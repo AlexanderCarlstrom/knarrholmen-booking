@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using api.Contracts.Requests;
 using api.Services;
 using api.Contracts;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -57,6 +58,7 @@ namespace api.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         [Route("logout")]
         public async Task<IActionResult> Logout([FromBody] LogoutRequest model)
         {
