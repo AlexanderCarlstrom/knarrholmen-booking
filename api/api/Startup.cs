@@ -1,13 +1,11 @@
 using System;
 using api.Contexts;
 using api.Contracts;
-using api.DTOs;
 using api.Entities;
 using api.Services;
 using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -65,7 +63,7 @@ namespace api
                     options => options.WithOrigins(Configuration["CorsOrigin"])
                         .WithHeaders("Access-Control-Allow-Origin", "Content-Type"));
             });
-
+            
             services.AddAutoMapper(typeof(Startup));
 
             services.AddScoped<IRoleService, RoleService>();

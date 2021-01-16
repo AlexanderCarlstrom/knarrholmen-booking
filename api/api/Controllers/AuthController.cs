@@ -51,22 +51,24 @@ namespace api.Controllers
             {
                 return StatusCode(401);
             }
-            
+
             var response = await _authService.LoginWithTokenASync(token);
             return StatusCode(response.StatusCode, response);
         }
 
         [HttpPost]
         [Route("logout")]
-        public async Task<IActionResult> Logout(string userId)
+        public async Task<IActionResult> Logout([FromBody] LogoutRequest model)
         {
-            var token = Request.Cookies[Authorization.RefreshTokenCookieName];
+            if (string.IsNullOrEmpty(model.UserId)) return BadRequest("User id is required");
+            var refreshToken = Request.Cookies[Authorization.RefreshTokenCookieName];
+            model.RefreshToken = refreshToken;
             var response =
-                await _authService.LogoutUserAsync(new LogoutRequest {UserId = userId, RefreshToken = token});
-
+                    await _authService.LogoutUserAsync(model);
+            RemoveRefreshTokenCookie();
             return StatusCode(response.StatusCode, response);
         }
-        
+
         [HttpGet]
         [Route("unauthorized")]
         public IActionResult InvalidOrNoAccessToken()
@@ -86,6 +88,13 @@ namespace api.Controllers
         {
             var cookieOptions = new CookieOptions {HttpOnly = true, Expires = expires, IsEssential = true};
             Response.Cookies.Append(Authorization.RefreshTokenCookieName, token, cookieOptions);
+        }
+
+        private void RemoveRefreshTokenCookie()
+        {
+            var cookieOptions = new CookieOptions {HttpOnly = true, Expires = DateTime.Now.AddMinutes(1), IsEssential = true};
+            Response.Cookies.Append(Authorization.RefreshTokenCookieName, "expired token", cookieOptions);
+            Response.Cookies.Append("refresh-token", "expired token", cookieOptions);
         }
     }
 }

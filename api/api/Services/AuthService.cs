@@ -127,12 +127,16 @@ namespace api.Services
 
         public async Task<Response> LogoutUserAsync(LogoutRequest model)
         {
-            var user = await _userManager.FindByIdAsync(model.UserId);
-            if (user == null) return new Response(400, "Could not find user");
+            await _signInManager.SignOutAsync();
+            
+            if (model.RefreshToken == null) return new Response(true, 200);
 
-            var tokenIndex = user.RefreshTokens.FindIndex(t => t.Token == model.RefreshToken);
-            if (tokenIndex == -1) return new Response(400, "Something went wrong");
-            // Remove token
+            var token = await _bookingDbContext.RefreshTokens.FindAsync(model.RefreshToken);
+            if (token == null) return new Response(false, 400, "Something went wrong");
+
+            _bookingDbContext.RefreshTokens.Remove(token);
+            await _bookingDbContext.SaveChangesAsync();
+            
             return new Response(true, 200);
         }
 

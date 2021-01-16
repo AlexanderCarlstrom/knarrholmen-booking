@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using api.Contexts;
 using api.Contracts;
+using api.Contracts.Requests;
 using api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
@@ -24,14 +25,21 @@ namespace api.Controllers
             _bookingDbContext = bookingDbContext;
         }
         
-        [HttpGet]
-        [Route("test")]
+        [HttpPost]
         [Authorize(Roles = UserRoles.Admin)]
-        public IActionResult Test()
+        public async Task<IActionResult> Create([FromBody] ActivityRequest model)
         {
-            return Ok("Hej");
+            var response = await _activityService.Create(model);
+            return StatusCode(response.StatusCode, response);
         }
-        
+
+        [HttpGet]
+        public IActionResult Search(ActivitySearchRequest model)
+        {
+            var response = _activityService.Search(model);
+            return StatusCode(response.StatusCode, response);
+        }
+
         // helper methods
         private IEnumerable<string> GetOpeningHours(int openTime, int closeTime)
         {

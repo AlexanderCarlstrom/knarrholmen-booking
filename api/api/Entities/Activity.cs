@@ -1,23 +1,35 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
 namespace api.Entities
 {
+    [Index(nameof(Name))]
     public class Activity
     {
         [Key] public string Id { get; set; }
         [Required] public string Name { get; set; }
-        [Required] public int Price { get; set; }
         public string Description { get; set; }
-        [Required] public string Address { get; set; }
-        public string OpenHoursId { get; set; }
-        public OpenHours OpenHours { get; set; }
+        [Required] public string Location { get; set; }
+
+        // Open time in half hours starting at 0
+        [DefaultValue(0)] [Required] public int Open { get; set; } = 0;
+
+        // Close time in half hours starting at 0
+        [DefaultValue(48)] [Required] public int Close { get; set; }
         [JsonIgnore] public List<Booking> Bookings { get; set; }
-        public Activity()
+
+        public Activity(string name, string description, string location, int open = 0, int close = 48)
         {
             Id = Guid.NewGuid().ToString();
+            Name = name;
+            Description = description;
+            Location = location;
+            Open = open;
+            Close = close;
         }
     }
 }

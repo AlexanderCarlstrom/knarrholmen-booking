@@ -9,6 +9,7 @@ namespace api.Contracts
         public MapperProfile()
         {
             CreateMap<User, UserDTO>();
+            CreateMap<Activity, ActivityDto>();
         }
     }
 }

@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using api.Contexts;
 
 namespace api.Migrations
 {
     [DbContext(typeof(BookingDbContext))]
-    partial class BookingContextModelSnapshot : ModelSnapshot
+    [Migration("20210116073929_RemovePriceFromActivity")]
+    partial class RemovePriceFromActivity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -49,14 +51,14 @@ namespace api.Migrations
                         new
                         {
                             Id = "037a87d5-2f44-474c-b494-295faeac310f",
-                            ConcurrencyStamp = "7b3ac917-1188-4354-a87a-671c532e0944",
+                            ConcurrencyStamp = "a587e6c2-4268-49b7-812e-ae3f030a42c2",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
                             Id = "b8973d7c-483d-4a3e-9d1b-c04a4d809323",
-                            ConcurrencyStamp = "4d1e4e7f-8d42-467e-b04d-5d06de880890",
+                            ConcurrencyStamp = "fe1fa629-2a04-4194-977c-786570506acd",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -195,9 +197,14 @@ namespace api.Migrations
                     b.Property<int>("Open")
                         .HasColumnType("int");
 
+                    b.Property<string>("OpenHoursId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("Name");
+
+                    b.HasIndex("OpenHoursId");
 
                     b.ToTable("Activities");
                 });
@@ -226,6 +233,22 @@ namespace api.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Bookings");
+                });
+
+            modelBuilder.Entity("api.Entities.OpenHours", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("Close")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Open")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("OpenHours");
                 });
 
             modelBuilder.Entity("api.Entities.RefreshToken", b =>
@@ -321,7 +344,7 @@ namespace api.Migrations
                         {
                             Id = "8e3db864-4c10-41d8-8060-b4edb0534fac",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "d5d306d9-3a8a-411a-96c0-c87e4ca21c93",
+                            ConcurrencyStamp = "89a15c53-78c2-4763-bfa7-dc530e0f1d7b",
                             Email = "alexander@gmail.com",
                             EmailConfirmed = true,
                             FirstName = "Alexander",
@@ -329,9 +352,9 @@ namespace api.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ALEXANDER@GMAIL.COM",
                             NormalizedUserName = "ALEXANDER@GMAIL.COM",
-                            PasswordHash = "AQAAAAEAACcQAAAAEOd762Df7ZICdbD3TrzsHXnsxQpco80ihUKX0s1YvQlyUycJGMTKTF3QZYsVb4YbAA==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEBsGkmcFHlGcmYOQKmYRWBfD2nLDYbu/z3e32DktEAiqZlSEh+4h7bsOt9cBQe4ZZQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "65a7a069-2bc4-4044-bf71-0a8a8ff7bef0",
+                            SecurityStamp = "c87ca10b-1844-42cd-9428-729401ad000a",
                             TwoFactorEnabled = false,
                             UserName = "alexander@gmail.com"
                         });
@@ -386,6 +409,15 @@ namespace api.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("api.Entities.Activity", b =>
+                {
+                    b.HasOne("api.Entities.OpenHours", "OpenHours")
+                        .WithMany()
+                        .HasForeignKey("OpenHoursId");
+
+                    b.Navigation("OpenHours");
                 });
 
             modelBuilder.Entity("api.Entities.Booking", b =>

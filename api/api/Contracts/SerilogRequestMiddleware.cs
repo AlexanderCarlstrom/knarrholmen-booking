@@ -27,6 +27,7 @@ namespace api.Contracts
 
             // start stopwatch
             var sw = new Stopwatch();
+            sw.Start();
             try
             {
                 await _next(httpContext);
