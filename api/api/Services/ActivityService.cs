@@ -61,17 +61,18 @@ namespace api.Services
 
         public ActivityResponse Search(ActivitySearchRequest model)
         {
-            List<ActivityDto> result;
+            List<ActivitiesDto> result;
             if (string.IsNullOrEmpty(model.Search))
             {
-                result = _bookingDbContext.Activities.Skip(model.Start).Take(model.Limit)
-                    .Select(a => _mapper.Map<ActivityDto>(a)).ToList();
+                result = _bookingDbContext.Activities.OrderBy(a => a.Name).Skip(model.Start).Take(model.Limit)
+                    .Select(a => _mapper.Map<ActivitiesDto>(a)).ToList();
                 return new ActivityResponse(200, result);
             }
 
             result = _bookingDbContext.Activities.Where(a => EF.Functions.Contains(a.Name, model.Search))
+                .OrderBy(a => a.Name)
                 .Skip(model.Start).Take(model.Limit)
-                .Select(a => _mapper.Map<ActivityDto>(a)).ToList();
+                .Select(a => _mapper.Map<ActivitiesDto>(a)).ToList();
             return new ActivityResponse(200, result);
         }
     }

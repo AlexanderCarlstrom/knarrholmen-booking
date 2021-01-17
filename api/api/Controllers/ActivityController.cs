@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -34,7 +35,16 @@ namespace api.Controllers
         }
 
         [HttpGet]
-        public IActionResult Search(ActivitySearchRequest model)
+        [Route("{id}")]
+        public async Task<IActionResult> GetOne(string id)
+        {
+            if (string.IsNullOrEmpty(id)) return BadRequest("Please provide a valid activity id");
+            var response = await _activityService.GetOne(id);
+            return StatusCode(response.StatusCode, response);
+        }
+
+        [HttpGet]
+        public IActionResult Search([FromQuery] ActivitySearchRequest model)
         {
             var response = _activityService.Search(model);
             return StatusCode(response.StatusCode, response);

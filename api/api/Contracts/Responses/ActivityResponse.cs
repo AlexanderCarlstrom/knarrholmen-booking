@@ -6,14 +6,14 @@ namespace api.Contracts.Responses
     public class ActivityResponse : Response
     {
         public ActivityDto Activity { get; set; }
-        public List<ActivityDto> Activities { get; set; }
+        public List<ActivitiesDto> Activities { get; set; }
 
         public ActivityResponse(int statusCode, ActivityDto activity) : base(true, statusCode)
         {
             Activity = activity;
         }
         
-        public ActivityResponse(int statusCode, List<ActivityDto> activities) : base(true, statusCode)
+        public ActivityResponse(int statusCode, List<ActivitiesDto> activities) : base(true, statusCode)
         {
             Activities = activities;
         }

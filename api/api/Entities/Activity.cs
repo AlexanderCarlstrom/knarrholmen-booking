@@ -14,15 +14,11 @@ namespace api.Entities
         [Required] public string Name { get; set; }
         public string Description { get; set; }
         [Required] public string Location { get; set; }
-
-        // Open time in half hours starting at 0
-        [DefaultValue(0)] [Required] public int Open { get; set; } = 0;
-
-        // Close time in half hours starting at 0
-        [DefaultValue(48)] [Required] public int Close { get; set; }
+        [Required] public int Open { get; set; } = 0;
+        [Required] public int Close { get; set; }
         [JsonIgnore] public List<Booking> Bookings { get; set; }
 
-        public Activity(string name, string description, string location, int open = 0, int close = 48)
+        public Activity(string name, string description, string location, int open = 0, int close = 24)
         {
             Id = Guid.NewGuid().ToString();
             Name = name;
