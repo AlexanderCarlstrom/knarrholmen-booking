@@ -7,8 +7,8 @@ namespace api.Services
 {
     public interface IRoleService
     {
-        Task<Response> CreateRoleAsync(string name);
-        Task<Response> DeleteRoleAsync(string id);
+        Task<ApiResponse> CreateRoleAsync(string name);
+        Task<ApiResponse> DeleteRoleAsync(string id);
     }
 
     public class RoleService : IRoleService
@@ -20,30 +20,30 @@ namespace api.Services
             _roleManager = roleManager;
         }
 
-        public async Task<Response> CreateRoleAsync(string name)
+        public async Task<ApiResponse> CreateRoleAsync(string name)
         {
             var role = await _roleManager.FindByNameAsync(name);
-            if (role != null) return new Response(400, name + " role already exist");
+            if (role != null) return new ApiResponse(400, name + " role already exist");
 
             var newRole = new IdentityRole(name);
             var result = await _roleManager.CreateAsync(newRole);
 
-            if (result.Succeeded) return new Response(true, 201);
+            if (result.Succeeded) return new ApiResponse(true, 201);
 
             var errors = result.Errors.Select(err => err.Description);
-            return new Response(500, "Could not create role", errors);
+            return new ApiResponse(500, "Could not create role", errors);
         }
 
-        public async Task<Response> DeleteRoleAsync(string id)
+        public async Task<ApiResponse> DeleteRoleAsync(string id)
         {
             var role = await _roleManager.FindByIdAsync(id);
-            if (role == null) return new Response(400, "Role does not exist");
+            if (role == null) return new ApiResponse(400, "Role does not exist");
 
             var result = await _roleManager.DeleteAsync(role);
 
-            if (result.Succeeded) return new Response(true, 200);
+            if (result.Succeeded) return new ApiResponse(true, 200);
 
-            var response = new Response(400, "Could not create role");
+            var response = new ApiResponse(400, "Could not create role");
             response.Errors = result.Errors.Select(err => err.Description);
             return response;
         }

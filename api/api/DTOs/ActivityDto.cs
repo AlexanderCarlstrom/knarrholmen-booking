@@ -11,6 +11,5 @@ namespace api.DTOs
         public string Location { get; set; }
         public int Open { get; set; }
         public int Close { get; set; }
-        public List<Booking> Bookings { get; set; }
     }
 }

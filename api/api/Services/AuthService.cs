@@ -18,13 +18,13 @@ namespace api.Services
 {
     public interface IAuthService
     {
-        Task<Response> RegisterUserAsync(RegisterRequest model);
+        Task<ApiResponse> RegisterUserAsync(RegisterRequest model);
         Task<UserResponse> LoginUserAsync(LoginRequest model);
         Task<UserResponse> LoginWithTokenASync(string refreshToken);
-        Task<Response> LogoutUserAsync(LogoutRequest model);
-        Task<Response> ConfirmEmailAsync(ConfirmEmailRequest model);
-        Task<Response> ForgetPasswordAsync([EmailAddress] string email);
-        Task<Response> ResetPasswordAsync(ResetPasswordRequest model);
+        Task<ApiResponse> LogoutUserAsync(LogoutRequest model);
+        Task<ApiResponse> ConfirmEmailAsync(ConfirmEmailRequest model);
+        Task<ApiResponse> ForgetPasswordAsync([EmailAddress] string email);
+        Task<ApiResponse> ResetPasswordAsync(ResetPasswordRequest model);
     }
 
     public class AuthService : IAuthService
@@ -47,11 +47,11 @@ namespace api.Services
         /// <summary>
         /// Creates a new user with given credentials and personal info
         /// </summary>
-        public async Task<Response> RegisterUserAsync(RegisterRequest model)
+        public async Task<ApiResponse> RegisterUserAsync(RegisterRequest model)
         {
             // check if user already exist
             var user = await _userManager.FindByEmailAsync(model.Email);
-            if (user != null) return new Response(422, "User already exist");
+            if (user != null) return new ApiResponse(422, "User already exist");
 
             var newUser = new User
             {
@@ -69,12 +69,12 @@ namespace api.Services
                 // TODO
                 // Send confirmation email
 
-                return new Response(true, 201);
+                return new ApiResponse(true, 201);
             }
 
             // return user registration errors
             var errors = result.Errors.Select(err => err.Description);
-            return new Response(400, "Could not register user, please try again", errors);
+            return new ApiResponse(400, "Could not register user, please try again", errors);
         }
 
         /// <summary>
@@ -125,32 +125,32 @@ namespace api.Services
             return new UserResponse(200, userDto);
         }
 
-        public async Task<Response> LogoutUserAsync(LogoutRequest model)
+        public async Task<ApiResponse> LogoutUserAsync(LogoutRequest model)
         {
             await _signInManager.SignOutAsync();
             
-            if (model.RefreshToken == null) return new Response(true, 200);
+            if (model.RefreshToken == null) return new ApiResponse(true, 200);
 
             var token = await _bookingDbContext.RefreshTokens.FindAsync(model.RefreshToken);
-            if (token == null) return new Response(false, 400, "Something went wrong");
+            if (token == null) return new ApiResponse(false, 400, "Something went wrong");
 
             _bookingDbContext.RefreshTokens.Remove(token);
             await _bookingDbContext.SaveChangesAsync();
             
-            return new Response(true, 200);
+            return new ApiResponse(true, 200);
         }
 
-        public Task<Response> ConfirmEmailAsync(ConfirmEmailRequest model)
+        public Task<ApiResponse> ConfirmEmailAsync(ConfirmEmailRequest model)
         {
             throw new System.NotImplementedException();
         }
 
-        public Task<Response> ForgetPasswordAsync([EmailAddress] string email)
+        public Task<ApiResponse> ForgetPasswordAsync([EmailAddress] string email)
         {
             throw new System.NotImplementedException();
         }
 
-        public Task<Response> ResetPasswordAsync(ResetPasswordRequest model)
+        public Task<ApiResponse> ResetPasswordAsync(ResetPasswordRequest model)
         {
             throw new System.NotImplementedException();
         }

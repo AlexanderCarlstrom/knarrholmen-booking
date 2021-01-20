@@ -14,7 +14,7 @@ namespace api.Services
 {
     public interface IActivityService
     {
-        Task<Response> Create(ActivityRequest model);
+        Task<ApiResponse> Create(ActivityRequest model);
         Task<ActivityResponse> GetOne(string activityId);
         ActivityResponse Search(ActivitySearchRequest model);
     }
@@ -30,7 +30,7 @@ namespace api.Services
             _mapper = mapper;
         }
 
-        public async Task<Response> Create(ActivityRequest model)
+        public async Task<ApiResponse> Create(ActivityRequest model)
         {
             var activity = new Activity(model.Name, model.Description, model.Location, model.Open, model.Close);
 
@@ -41,10 +41,10 @@ namespace api.Services
             }
             catch (Exception e)
             {
-                return new Response(400, "Could not create activity");
+                return new ApiResponse(400, "Could not create activity");
             }
 
-            return new Response(201, "Activity Created");
+            return new ApiResponse(201, "Activity Created");
         }
 
         public async Task<ActivityResponse> GetOne(string activityId)

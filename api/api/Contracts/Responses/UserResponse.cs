@@ -5,7 +5,7 @@ using api.Entities;
 
 namespace api.Contracts.Responses
 {
-    public class UserResponse : Response
+    public class UserResponse : ApiResponse
     {
         public UserDTO User { get; set; }
         [JsonIgnore] public RefreshToken RefreshToken { get; set; }

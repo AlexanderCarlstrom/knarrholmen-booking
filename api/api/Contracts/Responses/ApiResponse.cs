@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace api.Contracts.Responses
 {
-    public class Response
+    public class ApiResponse
     {
         public bool Success { get; set; }
         public string Message { get; set; }
@@ -13,7 +13,7 @@ namespace api.Contracts.Responses
         /// <summary>
         /// Basic response
         /// </summary>
-        public Response(bool success, int statusCode)
+        public ApiResponse(bool success, int statusCode)
         {
             Success = success;
             StatusCode = statusCode;
@@ -22,7 +22,7 @@ namespace api.Contracts.Responses
         /// <summary>
         /// Basic response with message
         /// </summary>
-        public Response(bool success, int statusCode, string message)
+        public ApiResponse(bool success, int statusCode, string message)
         {
             Success = success;
             StatusCode = statusCode;
@@ -32,12 +32,12 @@ namespace api.Contracts.Responses
         /// <summary>
         /// Basic error response
         /// </summary>
-        public Response(int statusCode, string message)
+        public ApiResponse(int statusCode, string message)
             : this(true, statusCode, message)
         {
         }
 
-        public Response(int statusCode, string message, IEnumerable<string> errors)
+        public ApiResponse(int statusCode, string message, IEnumerable<string> errors)
             : this(false, statusCode, message)
         {
             Errors = errors;
