@@ -55,6 +55,10 @@ namespace api.Services
         public async Task<ApiResponse> Create(BookingRequest model)
         {
             var user = await _userManager.GetUserAsync(model.UserPrincipal);
+            var exist = await _bookingDbContext.Bookings.AnyAsync(b =>
+                b.ActivityId == model.ActivityId && b.Start < model.End && model.Start < b.End);
+            if (exist) return new ApiResponse(400, "A booking already exist in time period");
+            
             var booking = new Booking
                 {Start = model.Start, End = model.End, ActivityId = model.ActivityId, UserId = user.Id};
             await _bookingDbContext.Bookings.AddAsync(booking);
