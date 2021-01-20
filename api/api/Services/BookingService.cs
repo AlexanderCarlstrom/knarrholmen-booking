@@ -1,6 +1,7 @@
 using System;
 using System.Globalization;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using api.Contexts;
 using api.Contracts.Requests;
@@ -10,14 +11,32 @@ using api.Entities;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
+using Serilog.Events;
 
 namespace api.Services
 {
     public interface IBookingService
     {
+        /// <summary>
+        /// Create a new booking
+        /// </summary>
         Task<ApiResponse> Create(BookingRequest model);
+
+        /// <summary>
+        /// Get all bookings in given week
+        /// </summary>
         Task<BookingResponse> GetBookingsWeek(BookingsWeekRequest model);
+
+        /// <summary>
+        /// Get all bookings in given day
+        /// </summary>
         Task<BookingResponse> GetBookingsDay(DateTime date);
+
+        /// <summary>
+        /// Get all future bookings for current user
+        /// </summary>
+        Task<BookingResponse> GetFutureBookings(ClaimsPrincipal userPrincipal);
     }
 
     public class BookingService : IBookingService
@@ -101,7 +120,18 @@ namespace api.Services
             var bookings = await _bookingDbContext.Bookings
                 .Where(booking => booking.Start >= from && booking.Start < to)
                 .Select(booking => _mapper.Map<PublicBookingsDto>(booking)).ToListAsync();
-            
+
+            return new BookingResponse(bookings);
+        }
+
+        public async Task<BookingResponse> GetFutureBookings(ClaimsPrincipal userPrincipal)
+        {
+            var user = await _userManager.GetUserAsync(userPrincipal);
+            var now = DateTime.Now;
+            var bookings = await _bookingDbContext.Bookings
+                .Where(booking => booking.UserId == user.Id && booking.Start >= now)
+                .Select(booking => _mapper.Map<PrivateBookingsDto>(booking)).ToListAsync();
+
             return new BookingResponse(bookings);
         }
     }

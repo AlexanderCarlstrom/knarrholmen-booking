@@ -46,5 +46,15 @@ namespace api.Controllers
             var response = await _bookingService.GetBookingsDay(date);
             return StatusCode(response.StatusCode, response);
         }
+
+        [HttpGet]
+        [Authorize]
+        [Route("future")]
+        public async Task<IActionResult> GetFutureBookings()
+        {
+            var userPrincipal = this.User;
+            var response = await _bookingService.GetFutureBookings(userPrincipal);
+            return StatusCode(response.StatusCode, response);
+        }
     }
 }

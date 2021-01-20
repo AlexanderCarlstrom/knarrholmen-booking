@@ -5,12 +5,12 @@ namespace api.Contracts.Responses
 {
     public class BookingResponse : ApiResponse
     {
-        public PrivateBookingsDto Booking { get; set; }
+        public List<PrivateBookingsDto> UserBookings { get; set; }
         public List<PublicBookingsDto> Bookings { get; set; }
 
-        public BookingResponse(PrivateBookingsDto booking) : base(true, 200)
+        public BookingResponse(List<PrivateBookingsDto> bookings) : base(true, 200)
         {
-            Booking = booking;
+            UserBookings = bookings;
         }
 
         public BookingResponse(List<PublicBookingsDto> bookings) : base(true, 200)
