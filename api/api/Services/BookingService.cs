@@ -17,6 +17,7 @@ namespace api.Services
     {
         Task<ApiResponse> Create(BookingRequest model);
         Task<BookingResponse> GetBookingsWeek(BookingsWeekRequest model);
+        Task<BookingResponse> GetBookingsDay(DateTime date);
     }
 
     public class BookingService : IBookingService
@@ -53,7 +54,7 @@ namespace api.Services
             // check if week is before current week
             if (model.Year == date.Year && model.Week < ISOWeek.GetWeekOfYear(date))
                 return new BookingResponse(400, "Week must be in the future");
-            
+
             // check if week is less than 1
             if (model.Week < 1) return new BookingResponse(400, "Week must be at least 1");
             var numberOfWeeks = ISOWeek.GetWeeksInYear(model.Year);
@@ -68,7 +69,39 @@ namespace api.Services
 
             var bookings = await _bookingDbContext.Bookings.Where(b => b.Start >= from && b.Start < to)
                 .Select(b => _mapper.Map<PublicBookingsDto>(b)).ToListAsync();
-            Console.WriteLine(bookings);
+            return new BookingResponse(bookings);
+        }
+
+        public async Task<BookingResponse> GetBookingsDay(DateTime date)
+        {
+            var today = DateTime.Today;
+            // check if date is in the past
+            if (date < today) return new BookingResponse(400, "Date must be in the future");
+
+            var year = date.Year;
+            var month = date.Month;
+            var day = date.Day;
+
+            var from = new DateTime(year, month, day);
+            if (month == 12)
+            {
+                year++;
+                month = 1;
+                day = 1;
+            }
+            else if (day == DateTime.DaysInMonth(year, month))
+            {
+                month++;
+                day = 1;
+            }
+            else day++;
+
+            var to = new DateTime(year, month, day);
+
+            var bookings = await _bookingDbContext.Bookings
+                .Where(booking => booking.Start >= from && booking.Start < to)
+                .Select(booking => _mapper.Map<PublicBookingsDto>(booking)).ToListAsync();
+            
             return new BookingResponse(bookings);
         }
     }

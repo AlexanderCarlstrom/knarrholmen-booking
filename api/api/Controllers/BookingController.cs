@@ -39,5 +39,12 @@ namespace api.Controllers
             var response = await _bookingService.GetBookingsWeek(model);
             return StatusCode(response.StatusCode, response);
         }
+
+        [HttpGet("{date}")]
+        public async Task<IActionResult> GetBookingsDay(DateTime date)
+        {
+            var response = await _bookingService.GetBookingsDay(date);
+            return StatusCode(response.StatusCode, response);
+        }
     }
 }
