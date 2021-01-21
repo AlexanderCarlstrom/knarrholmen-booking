@@ -37,6 +37,11 @@ namespace api.Services
         /// Get all future bookings for current user
         /// </summary>
         Task<BookingResponse> GetFutureBookings(ClaimsPrincipal userPrincipal);
+
+        /// <summary>
+        /// Get all past bookings for current user
+        /// </summary>
+        Task<BookingResponse> GetPastBookings(ClaimsPrincipal userPrincipal);
     }
 
     public class BookingService : IBookingService
@@ -134,6 +139,17 @@ namespace api.Services
             var now = DateTime.Now;
             var bookings = await _bookingDbContext.Bookings
                 .Where(booking => booking.UserId == user.Id && booking.Start >= now)
+                .Select(booking => _mapper.Map<PrivateBookingsDto>(booking)).ToListAsync();
+
+            return new BookingResponse(bookings);
+        }
+
+        public async Task<BookingResponse> GetPastBookings(ClaimsPrincipal userPrincipal)
+        {
+            var user = await _userManager.GetUserAsync(userPrincipal);
+            var now = DateTime.Now;
+            var bookings = await _bookingDbContext.Bookings
+                .Where(booking => booking.UserId == user.Id && booking.Start < now)
                 .Select(booking => _mapper.Map<PrivateBookingsDto>(booking)).ToListAsync();
 
             return new BookingResponse(bookings);

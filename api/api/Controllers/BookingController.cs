@@ -56,5 +56,15 @@ namespace api.Controllers
             var response = await _bookingService.GetFutureBookings(userPrincipal);
             return StatusCode(response.StatusCode, response);
         }
+        
+        [HttpGet]
+        [Authorize]
+        [Route("past")]
+        public async Task<IActionResult> GetPastBookings()
+        {
+            var userPrincipal = this.User;
+            var response = await _bookingService.GetPastBookings(userPrincipal);
+            return StatusCode(response.StatusCode, response);
+        }
     }
 }
