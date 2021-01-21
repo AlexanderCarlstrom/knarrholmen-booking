@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using api.Contexts;
+using api.Contracts;
 using api.Contracts.Requests;
 using api.Contracts.Responses;
 using api.DTOs;
@@ -60,10 +61,26 @@ namespace api.Services
         public async Task<ApiResponse> Create(BookingRequest model)
         {
             var user = await _userManager.GetUserAsync(model.UserPrincipal);
+            
+            var userRoles = await _userManager.GetRolesAsync(user);
+            if (!userRoles.Contains(UserRoles.Admin))
+            {
+                // check if bookings is to long
+                var diff = model.End - model.Start;
+                if (diff.TotalMinutes > 60) return new ApiResponse(400, "Booking time is to long");
+                // check if user already have a booking that day
+                var from = new DateTime(model.Start.Year, model.Start.Month, model.Start.Day);
+                var to = GetNextDay(from);
+                var result = await _bookingDbContext.Bookings.AnyAsync(b =>
+                    b.ActivityId == model.ActivityId && b.UserId == user.Id && b.Start >= from && b.Start < to);
+                if (result) return new ApiResponse(400, "A booking already exist for user that day");
+            }
+
+            // check if there is already a booking at that time
             var exist = await _bookingDbContext.Bookings.AnyAsync(b =>
                 b.ActivityId == model.ActivityId && b.Start < model.End && model.Start < b.End);
             if (exist) return new ApiResponse(400, "A booking already exist in time period");
-            
+
             var booking = new Booking
                 {Start = model.Start, End = model.End, ActivityId = model.ActivityId, UserId = user.Id};
             await _bookingDbContext.Bookings.AddAsync(booking);
@@ -111,20 +128,8 @@ namespace api.Services
             var day = date.Day;
 
             var from = new DateTime(year, month, day);
-            if (month == 12)
-            {
-                year++;
-                month = 1;
-                day = 1;
-            }
-            else if (day == DateTime.DaysInMonth(year, month))
-            {
-                month++;
-                day = 1;
-            }
-            else day++;
 
-            var to = new DateTime(year, month, day);
+            var to = GetNextDay(from);
 
             var bookings = await _bookingDbContext.Bookings
                 .Where(booking => booking.Start >= from && booking.Start < to)
@@ -153,6 +158,28 @@ namespace api.Services
                 .Select(booking => _mapper.Map<PrivateBookingsDto>(booking)).ToListAsync();
 
             return new BookingResponse(bookings);
+        }
+
+        private static DateTime GetNextDay(DateTime today)
+        {
+            var year = today.Year;
+            var month = today.Month;
+            var day = today.Day;
+
+            if (month == 12)
+            {
+                year++;
+                month = 1;
+                day = 1;
+            }
+            else if (day == DateTime.DaysInMonth(year, month))
+            {
+                month++;
+                day = 1;
+            }
+            else day++;
+
+            return new DateTime(year, month, day);
         }
     }
 }
