@@ -1,6 +1,16 @@
 import { Link, NavLink, RouteComponentProps, withRouter } from 'react-router-dom';
 import { Button, Drawer, Dropdown, Layout, Menu } from 'antd';
-import { DownOutlined, MenuOutlined } from '@ant-design/icons';
+import {
+  DownOutlined,
+  MenuOutlined,
+  HomeOutlined,
+  CalendarOutlined,
+  UserOutlined,
+  LogoutOutlined,
+  RocketOutlined,
+  LoginOutlined,
+  FormOutlined,
+} from '@ant-design/icons';
 import React, { useState } from 'react';
 import 'antd/dist/antd.css';
 
@@ -18,9 +28,9 @@ const Navbar = (props: RouteComponentProps) => {
   return (
     <React.Fragment>
       {width < breakpoint ? (
-        <MobileMenu pathName={props.location.pathname} />
+        <MobileMenu pathName={props.location.pathname} width={width} />
       ) : (
-        <DesktopMenu pathName={props.location.pathname} />
+        <DesktopMenu pathName={props.location.pathname} width={width} />
       )}
     </React.Fragment>
   );
@@ -31,38 +41,39 @@ const DesktopMenu = ({ pathName }: MenuProps) => {
   return (
     <React.Fragment>
       <Header className="navbar">
-        <NavLink to="/" className="brand">
-          Knarrholmen
-        </NavLink>
+        <div className="navbar-container">
+          <NavLink to="/" className="brand">
+            KNARRHOLMEN
+          </NavLink>
 
-        <div className="navigation">
-          <Menu selectedKeys={[pathName]} mode="horizontal">
-            <Menu.Item key="/">
-              <Link to="/">Home</Link>
-            </Menu.Item>
-            <Menu.Item key="/activities">
-              <Link to="/activities">Activities</Link>
-            </Menu.Item>
-          </Menu>
-          {user === null ? (
-            <div className="buttons">
-              <Button type="primary" ghost className="button">
-                <Link to="/auth/login">Log In</Link>
-              </Button>
-              <Button type="primary" className="button">
-                <Link to="/auth/sign-up">Sign Up</Link>
-              </Button>
-            </div>
-          ) : (
-            <UserDropdown user={user} />
-          )}
+          <div className="navigation">
+            <Menu selectedKeys={[pathName]} mode="horizontal" className="menu">
+              <Menu.Item key="/" className="menu-item">
+                <Link to="/">Home</Link>
+              </Menu.Item>
+              <Menu.Item key="/activities" className="menu-item">
+                <Link to="/activities">Activities</Link>
+              </Menu.Item>
+              {user === null && (
+                <>
+                  <Menu.Item className="menu-item">
+                    <Link to="/auth/login">Log In</Link>
+                  </Menu.Item>
+                  <Menu.Item className="menu-item">
+                    <Link to="/auth/sign-up">Sign Up</Link>
+                  </Menu.Item>
+                </>
+              )}
+            </Menu>
+            {user !== null && <UserDropdown user={user} />}
+          </div>
         </div>
       </Header>
     </React.Fragment>
   );
 };
 
-const MobileMenu = ({ pathName }: MenuProps) => {
+const MobileMenu = ({ pathName, width }: MenuProps) => {
   const [visible, setVisible] = useState(false);
   const { user } = useAuth();
 
@@ -71,32 +82,51 @@ const MobileMenu = ({ pathName }: MenuProps) => {
 
   return (
     <React.Fragment>
-      <Header className="navbar mobile">
-        <NavLink to="/" className="brand">
-          Booking
-        </NavLink>
-        <Button type="primary" ghost icon={<MenuOutlined />} onClick={showDrawer} className="drawer-btn" />
-        {user !== null && <UserDropdown user={user} />}
+      <Header className="navbar">
+        <div className="navbar-container">
+          <a href="" className="brand">
+            KNARRHOLMEN
+          </a>
+          <div className="navigation">
+            {width >= 768 && user !== null && <UserDropdown user={user} />}
+            <Button ghost icon={<MenuOutlined />} onClick={showDrawer} className="drawer-btn" />
+          </div>
+        </div>
       </Header>
       <Drawer title="Menu" width="300" placement="left" onClose={closeDrawer} visible={visible} className="drawer">
-        <Menu selectedKeys={[pathName]} mode="inline" className="drawer-menu">
-          <Menu.Item key="/">
+        <Menu selectedKeys={[pathName]} mode="inline" className="drawer-menu" theme="light">
+          <Menu.Item key="/" icon={<HomeOutlined />} className="menu-item">
             <Link to="/">Home</Link>
           </Menu.Item>
-          <Menu.Item key="/activities">
+          <Menu.Item key="/activities" icon={<RocketOutlined />} className="menu-item">
             <Link to="/activities">Activities</Link>
           </Menu.Item>
+
+          {width < 768 && user !== null && (
+            <Menu.ItemGroup title={createUserDisplayName(user.firstName)} className="user-name">
+              <Menu.Item icon={<UserOutlined />}>
+                <Link to="/profile">Profile</Link>
+              </Menu.Item>
+              <Menu.Item icon={<CalendarOutlined />}>
+                <Link to="/bookings">Bookings</Link>
+              </Menu.Item>
+              <Menu.Item icon={<LogoutOutlined />}>
+                <Link to="/logout">Logout</Link>
+              </Menu.Item>
+            </Menu.ItemGroup>
+          )}
+
+          {user === null && (
+            <>
+              <Menu.Item className="menu-item" icon={<LoginOutlined />}>
+                <Link to="/auth/login">Log In</Link>
+              </Menu.Item>
+              <Menu.Item className="menu-item" icon={<FormOutlined />}>
+                <Link to="/auth/sign-up">Sign Up</Link>
+              </Menu.Item>
+            </>
+          )}
         </Menu>
-        {user === null && (
-          <Menu mode="inline" className="drawer-menu">
-            <Menu.Item>
-              <Link to="/auth/login">Log In</Link>
-            </Menu.Item>
-            <Menu.Item>
-              <Link to="/auth/sign-up">Sign Up</Link>
-            </Menu.Item>
-          </Menu>
-        )}
       </Drawer>
     </React.Fragment>
   );
@@ -116,7 +146,7 @@ const UserDropdown = ({ user }: UserDropdownProps) => {
 
   return (
     <Dropdown overlay={dropdownUserMenu} arrow trigger={['hover', 'click']} placement="bottomRight">
-      <Button className="user-btn" type="primary" ghost>
+      <Button className="user-btn" type="text">
         {createUserDisplayName(user.firstName)}
         <DownOutlined />
       </Button>
@@ -129,7 +159,7 @@ const createUserDisplayName = (firstName: string) => {
   return firstName.substr(0, 10) + '...';
 };
 
-type MenuProps = { pathName: string };
+type MenuProps = { pathName: string; width: number };
 
 type UserDropdownProps = { user: User };
 
