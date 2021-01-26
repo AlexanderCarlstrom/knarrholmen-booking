@@ -1,19 +1,29 @@
 import { Redirect, Route, RouteComponentProps, Switch, withRouter } from 'react-router-dom';
 import { Layout } from 'antd';
 import 'antd/dist/antd.css';
-import React from 'react';
+import React, { useLayoutEffect } from 'react';
 
 import { Activities } from './components/Activities/Activities';
+import Bookings from './components/Bookings/Bookings';
 import Navbar from './components/Navbar/Navbar';
 import Footer from './components/Footer/Footer';
 import Logout from './components/Auth/Logout';
 import Auth from './components/Auth/Auth';
 import Home from './components/Home/Home';
 import './App.scss';
+import { setUpAuthInterceptors } from './utils/axios';
+import { useAuth } from './context/AuthContext';
+import PrivateRoute from './utils/PrivateRoute';
 
 const { Content } = Layout;
 
 const App = (props: RouteComponentProps) => {
+  const { refreshToken, logout } = useAuth();
+
+  useLayoutEffect(() => {
+    setUpAuthInterceptors(refreshToken, logout);
+  }, []);
+
   return (
     <Layout className="app">
       {props.location.pathname !== '/auth/login' && props.location.pathname !== '/auth/sign-up' ? <Navbar /> : null}
@@ -21,6 +31,7 @@ const App = (props: RouteComponentProps) => {
         <Switch>
           <Route exact path="/" component={Home} />
           <Route path="/activities/:search?" component={Activities} />
+          <PrivateRoute path="/bookings" component={Bookings} />
           <Route path="/auth" component={Auth} />
           <Route path="/logout" component={Logout} />
           <Route render={() => <Redirect exact to="/" />} />
