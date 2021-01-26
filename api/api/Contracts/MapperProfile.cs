@@ -10,6 +10,7 @@ namespace api.Contracts
         {
             CreateMap<User, UserDTO>();
             CreateMap<Activity, ActivityDto>();
+            CreateMap<Activity, ActivitiesDto>();
             CreateMap<Booking, PublicBookingsDto>();
             CreateMap<Booking, PrivateBookingsDto>();
         }

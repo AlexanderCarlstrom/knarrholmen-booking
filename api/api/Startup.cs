@@ -61,9 +61,9 @@ namespace api
             {
                 c.AddPolicy("AllowOrigin",
                     options => options.WithOrigins(Configuration["CorsOrigin"])
-                        .WithHeaders("Access-Control-Allow-Origin", "Content-Type"));
+                        .WithHeaders("Access-Control-Allow-Origin", "Content-Type").AllowCredentials());
             });
-            
+
             services.AddAutoMapper(typeof(Startup));
 
             services.AddScoped<IRoleService, RoleService>();

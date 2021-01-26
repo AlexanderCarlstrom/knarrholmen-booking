@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using api.Contexts;
@@ -20,7 +21,8 @@ namespace api.Services
     {
         Task<ApiResponse> RegisterUserAsync(RegisterRequest model);
         Task<UserResponse> LoginUserAsync(LoginRequest model);
-        Task<UserResponse> LoginWithTokenASync(string refreshToken);
+        Task<UserResponse> RefreshTokenAsync(string refreshToken);
+        Task<UserResponse> LoginWithTokenAsync(ClaimsPrincipal userPrincipal);
         Task<ApiResponse> LogoutUserAsync(LogoutRequest model);
         Task<ApiResponse> ConfirmEmailAsync(ConfirmEmailRequest model);
         Task<ApiResponse> ForgetPasswordAsync([EmailAddress] string email);
@@ -114,7 +116,7 @@ namespace api.Services
 
         }
 
-        public async Task<UserResponse> LoginWithTokenASync(string refreshToken)
+        public async Task<UserResponse> RefreshTokenAsync(string refreshToken)
         {
             var token = await _bookingDbContext.RefreshTokens.FindAsync(refreshToken);
             if (token == null) return new UserResponse(401, "invalid refresh token");
@@ -123,6 +125,13 @@ namespace api.Services
             
             var userDto = _mapper.Map<UserDTO>(user);
             return new UserResponse(200, userDto);
+        }
+
+        public async Task<UserResponse> LoginWithTokenAsync(ClaimsPrincipal userPrincipal)
+        {
+            var user = await _userManager.GetUserAsync(userPrincipal);
+            if (user == null) return new UserResponse(400, "Could not find user");
+            return new UserResponse(200, _mapper.Map<UserDTO>(user));
         }
 
         public async Task<ApiResponse> LogoutUserAsync(LogoutRequest model)

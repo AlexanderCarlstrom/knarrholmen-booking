@@ -1,6 +1,7 @@
 using System;
 using System.Globalization;
 using System.Threading.Tasks;
+using api.Contracts;
 using api.Contracts.Requests;
 using api.Services;
 using Microsoft.AspNetCore.Authorization;

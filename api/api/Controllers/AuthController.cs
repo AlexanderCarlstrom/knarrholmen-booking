@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 
 namespace api.Controllers
 {
@@ -44,8 +45,8 @@ namespace api.Controllers
         }
 
         [HttpGet]
-        [Route("login-with-token")]
-        public async Task<IActionResult> LoginWithToken()
+        [Route("refresh-token")]
+        public async Task<IActionResult> RefreshToken()
         {
             var getToken = Request.Cookies.TryGetValue(Authorization.RefreshTokenCookieName, out var token);
             if (!getToken)
@@ -53,12 +54,21 @@ namespace api.Controllers
                 return StatusCode(401);
             }
 
-            var response = await _authService.LoginWithTokenASync(token);
+            var response = await _authService.RefreshTokenAsync(token);
+            return StatusCode(response.StatusCode, response);
+        }
+
+        [HttpGet]
+        [Route("login-with-token")]
+        [Authorize]
+        public async Task<IActionResult> LoginWithToken()
+        {
+            var userPrincipal = this.User;
+            var response = await _authService.LoginWithTokenAsync(userPrincipal);
             return StatusCode(response.StatusCode, response);
         }
 
         [HttpPost]
-        [Authorize]
         [Route("logout")]
         public async Task<IActionResult> Logout([FromBody] LogoutRequest model)
         {
@@ -66,7 +76,7 @@ namespace api.Controllers
             var refreshToken = Request.Cookies[Authorization.RefreshTokenCookieName];
             model.RefreshToken = refreshToken;
             var response =
-                    await _authService.LogoutUserAsync(model);
+                await _authService.LogoutUserAsync(model);
             RemoveRefreshTokenCookie();
             return StatusCode(response.StatusCode, response);
         }
@@ -94,9 +104,8 @@ namespace api.Controllers
 
         private void RemoveRefreshTokenCookie()
         {
-            var cookieOptions = new CookieOptions {HttpOnly = true, Expires = DateTime.Now.AddMinutes(1), IsEssential = true};
+            var cookieOptions = new CookieOptions {HttpOnly = true, Expires = DateTime.Now, IsEssential = true};
             Response.Cookies.Append(Authorization.RefreshTokenCookieName, "expired token", cookieOptions);
-            Response.Cookies.Append("refresh-token", "expired token", cookieOptions);
         }
     }
 }
