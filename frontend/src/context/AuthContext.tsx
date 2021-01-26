@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { AxiosResponse } from 'axios';
 
+import { ApiResponse, UserResponse } from '../types/ApiReponse';
 import { ContainterProps } from '../types/ContainterProps';
-import { ApiResponse } from '../types/ApiReponse';
 import { publicFetch } from '../utils/axios';
 
 const AuthContext = React.createContext(null);
@@ -12,8 +12,8 @@ const AuthProvider = ({ children }: ContainterProps) => {
 
   const logIn = (credentials: LoginValues) => {
     return publicFetch
-      .post<ApiResponse>('auth/login', credentials)
-      .then((response: AxiosResponse<ApiResponse>) => {
+      .post<UserResponse>('auth/login', credentials, { withCredentials: true })
+      .then((response: AxiosResponse<UserResponse>) => {
         const { data } = response;
         if (data.success) {
           setUser(data.user);
@@ -25,8 +25,16 @@ const AuthProvider = ({ children }: ContainterProps) => {
 
   const signUp = (credentials: SignUpValues) => publicFetch.post<ApiResponse>('auth/register', credentials);
 
+  const refreshToken = () => {
+    return publicFetch.get('auth/refresh-token', { withCredentials: true }).then((res: AxiosResponse<UserResponse>) => {
+      setUser(res.data.user);
+    });
+  };
+
   const logout = () => {
-    setUser(null);
+    publicFetch.get('auth/logout', { withCredentials: true }).then(() => {
+      setUser(null);
+    });
   };
 
   return (
@@ -36,6 +44,7 @@ const AuthProvider = ({ children }: ContainterProps) => {
         setUser,
         logIn: (credentials: LoginValues) => logIn(credentials),
         signUp: (credentials: SignUpValues) => signUp(credentials),
+        refreshToken: () => refreshToken(),
         logout: () => logout(),
       }}
     >
