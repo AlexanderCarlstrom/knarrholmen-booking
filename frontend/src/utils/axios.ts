@@ -6,7 +6,7 @@ import { User } from '../types/User';
 const publicFetch = axios.create({ baseURL: process.env.REACT_APP_API_URL });
 const privateFetch = axios.create({ baseURL: process.env.REACT_APP_API_URL, withCredentials: true });
 
-const setUpAuthInterceptors = (setUser: Dispatch<User>, navigateTo: (path: string) => void) => {
+const setUpAuthInterceptors = (setUser: Dispatch<User>) => {
   privateFetch.interceptors.response.use(
     (response) => response,
     (error) => {
@@ -17,10 +17,10 @@ const setUpAuthInterceptors = (setUser: Dispatch<User>, navigateTo: (path: strin
           .then(() => {
             return axios(originalRequest);
           })
-          .catch(() => {
+          .catch((err) => {
             setUser(null);
-            navigateTo('/auth/login');
-            return Promise.reject();
+            console.log(err);
+            // return Promise.reject();
           });
       }
     },

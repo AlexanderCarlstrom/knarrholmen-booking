@@ -46,10 +46,19 @@ $background: rgba(#fff, 0.8);
     .navigation {
       display: flex;
       justify-content: space-between;
+      align-items: center;
 
       .menu {
         background: #000;
         border: none;
+
+        .user-name .ant-menu-submenu-title {
+          color: #fff;
+
+          .ant-menu-submenu-arrow {
+            background: #fff;
+          }
+        }
 
         .menu-item {
           font-family: $lato;
@@ -69,27 +78,36 @@ $background: rgba(#fff, 0.8);
           }
         }
       }
-    }
 
-    .drawer-btn {
-      color: #fff;
-      border-right: -8px;
+      .drawer-btn {
+        color: #fff;
+        border-right: -8px;
 
-      &:hover {
-        color: $primary;
+        &:hover {
+          color: $primary;
+        }
+      }
+
+      .user-btn {
+        cursor: pointer;
+        color: #fff;
+        font-family: $lato;
+
+        &:hover {
+          color: $primary;
+        }
       }
     }
-
-    .user-btn {
-      cursor: pointer;
-      color: #fff;
-    }
   }
+}
+.user-name .ant-menu-submenu-title {
+  font-family: $quicksand;
+  font-size: 16px;
+  color: #000;
 }
 
 .drawer {
   .ant-drawer-header {
-    border-bottom: 1px solid $primary;
     .ant-drawer-title {
       font-family: $lato;
     }

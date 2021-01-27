@@ -26,12 +26,14 @@ const AuthProvider = ({ children }: ContainterProps) => {
   const signUp = (credentials: SignUpValues) => publicFetch.post<ApiResponse>('auth/register', credentials);
 
   const loginWithToken = () => {
-    privateFetch
+    return privateFetch
       .get<UserResponse>('auth/login-with-token')
       .then((res: AxiosResponse<UserResponse>) => {
         setUser(res.data.user);
       })
-      .catch((err) => err);
+      .catch(() => {
+        setUser(null);
+      });
   };
 
   const logout = () => {
