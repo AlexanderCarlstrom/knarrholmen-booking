@@ -1,7 +1,7 @@
 import { Redirect, Route, RouteComponentProps, Switch, withRouter } from 'react-router-dom';
 import { Layout } from 'antd';
 import 'antd/dist/antd.css';
-import React, { useLayoutEffect } from 'react';
+import React, { useEffect, useLayoutEffect } from 'react';
 
 import { Activities } from './components/Activities/Activities';
 import Bookings from './components/Bookings/Bookings';
@@ -18,10 +18,14 @@ import PrivateRoute from './utils/PrivateRoute';
 const { Content } = Layout;
 
 const App = (props: RouteComponentProps) => {
-  const { refreshToken, logout } = useAuth();
+  const { setUser, loginWithToken } = useAuth();
 
   useLayoutEffect(() => {
-    setUpAuthInterceptors(refreshToken, logout);
+    setUpAuthInterceptors(setUser, (path) => props.history.push(path));
+  }, []);
+
+  useEffect(() => {
+    loginWithToken();
   }, []);
 
   return (

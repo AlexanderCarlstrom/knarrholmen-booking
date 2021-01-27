@@ -14,6 +14,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 
 namespace api.Services
 {
@@ -21,7 +22,7 @@ namespace api.Services
     {
         Task<ApiResponse> RegisterUserAsync(RegisterRequest model);
         Task<UserResponse> LoginUserAsync(LoginRequest model);
-        Task<UserResponse> RefreshTokenAsync(string refreshToken);
+        Task<ApiResponse> RefreshTokenAsync(string refreshToken);
         Task<UserResponse> LoginWithTokenAsync(ClaimsPrincipal userPrincipal);
         Task<ApiResponse> LogoutUserAsync(LogoutRequest model);
         Task<ApiResponse> ConfirmEmailAsync(ConfirmEmailRequest model);
@@ -105,7 +106,7 @@ namespace api.Services
             var userDto = _mapper.Map<UserDTO>(user);
 
             if (!model.Remember) return new UserResponse(200, userDto);
-            
+
             // Create refresh token
             var token = new RefreshToken(DateTime.Now.AddDays(30));
             user.RefreshTokens.Add(token);
@@ -113,18 +114,17 @@ namespace api.Services
             await _bookingDbContext.SaveChangesAsync();
 
             return new UserResponse(200, userDto, token);
-
         }
 
-        public async Task<UserResponse> RefreshTokenAsync(string refreshToken)
+        public async Task<ApiResponse> RefreshTokenAsync(string refreshToken)
         {
             var token = await _bookingDbContext.RefreshTokens.FindAsync(refreshToken);
-            if (token == null) return new UserResponse(401, "invalid refresh token");
+            if (token == null) return new ApiResponse(401, "invalid refresh token");
+
             var user = await _userManager.FindByIdAsync(token.UserId);
             await _signInManager.SignInAsync(user, true);
-            
-            var userDto = _mapper.Map<UserDTO>(user);
-            return new UserResponse(200, userDto);
+
+            return new ApiResponse(true, 200);
         }
 
         public async Task<UserResponse> LoginWithTokenAsync(ClaimsPrincipal userPrincipal)
@@ -137,15 +137,16 @@ namespace api.Services
         public async Task<ApiResponse> LogoutUserAsync(LogoutRequest model)
         {
             await _signInManager.SignOutAsync();
-            
+
             if (model.RefreshToken == null) return new ApiResponse(true, 200);
 
-            var token = await _bookingDbContext.RefreshTokens.FindAsync(model.RefreshToken);
-            if (token == null) return new ApiResponse(false, 400, "Something went wrong");
+            var refreshToken = _bookingDbContext.RefreshTokens.First(token =>
+                token.Token == model.RefreshToken && token.UserId == model.UserId);
+            if (refreshToken == null) return new ApiResponse(false, 400, "Something went wrong");
 
-            _bookingDbContext.RefreshTokens.Remove(token);
+            _bookingDbContext.RefreshTokens.Remove(refreshToken);
             await _bookingDbContext.SaveChangesAsync();
-            
+
             return new ApiResponse(true, 200);
         }
 

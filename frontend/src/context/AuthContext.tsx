@@ -3,7 +3,7 @@ import { AxiosResponse } from 'axios';
 
 import { ApiResponse, UserResponse } from '../types/ApiReponse';
 import { ContainterProps } from '../types/ContainterProps';
-import { publicFetch } from '../utils/axios';
+import { privateFetch, publicFetch } from '../utils/axios';
 
 const AuthContext = React.createContext(null);
 
@@ -25,10 +25,13 @@ const AuthProvider = ({ children }: ContainterProps) => {
 
   const signUp = (credentials: SignUpValues) => publicFetch.post<ApiResponse>('auth/register', credentials);
 
-  const refreshToken = () => {
-    return publicFetch.get('auth/refresh-token', { withCredentials: true }).then((res: AxiosResponse<UserResponse>) => {
-      setUser(res.data.user);
-    });
+  const loginWithToken = () => {
+    return privateFetch
+      .get<UserResponse>('auth/login-with-token')
+      .then((res: AxiosResponse<UserResponse>) => {
+        setUser(res.data.user);
+      })
+      .catch((err) => err);
   };
 
   const logout = () => {
@@ -44,7 +47,7 @@ const AuthProvider = ({ children }: ContainterProps) => {
         setUser,
         logIn: (credentials: LoginValues) => logIn(credentials),
         signUp: (credentials: SignUpValues) => signUp(credentials),
-        refreshToken: () => refreshToken(),
+        loginWithToken: () => loginWithToken(),
         logout: () => logout(),
       }}
     >

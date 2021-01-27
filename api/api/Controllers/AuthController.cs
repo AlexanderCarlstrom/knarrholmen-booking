@@ -85,7 +85,6 @@ namespace api.Controllers
         [Route("unauthorized")]
         public IActionResult InvalidOrNoAccessToken()
         {
-            Response.Headers.Add("token-expired", "true");
             return StatusCode(401);
         }
 
