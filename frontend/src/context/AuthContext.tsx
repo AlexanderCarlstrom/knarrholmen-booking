@@ -26,7 +26,7 @@ const AuthProvider = ({ children }: ContainterProps) => {
   const signUp = (credentials: SignUpValues) => publicFetch.post<ApiResponse>('auth/register', credentials);
 
   const loginWithToken = () => {
-    return privateFetch
+    privateFetch
       .get<UserResponse>('auth/login-with-token')
       .then((res: AxiosResponse<UserResponse>) => {
         setUser(res.data.user);
@@ -35,7 +35,7 @@ const AuthProvider = ({ children }: ContainterProps) => {
   };
 
   const logout = () => {
-    publicFetch.get('auth/logout', { withCredentials: true }).then(() => {
+    publicFetch.post('auth/logout', { userId: user.id }, { withCredentials: true }).then(() => {
       setUser(null);
     });
   };
