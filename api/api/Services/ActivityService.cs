@@ -32,7 +32,7 @@ namespace api.Services
 
         public async Task<ApiResponse> Create(ActivityRequest model)
         {
-            var activity = new Activity(model.Name, model.Description, model.Location, model.Open, model.Close);
+            var activity = new Activity(model.Name.ToLower(), model.Description, model.Location, model.Open, model.Close);
 
             try
             {
@@ -68,8 +68,7 @@ namespace api.Services
                     .Select(a => _mapper.Map<ActivitiesDto>(a)).ToList();
                 return new ActivityResponse(200, result);
             }
-
-            result = _bookingDbContext.Activities.Where(a => EF.Functions.Contains(a.Name, model.Search))
+            result = _bookingDbContext.Activities.Where(a => EF.Functions.Like(a.Name, "%" + model.Search.ToLower() + "%"))
                 .OrderBy(a => a.Name)
                 .Skip(model.Start).Take(model.Limit)
                 .Select(a => _mapper.Map<ActivitiesDto>(a)).ToList();

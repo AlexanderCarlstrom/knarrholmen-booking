@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using api.Contexts;
 
 namespace api.Migrations
 {
     [DbContext(typeof(BookingDbContext))]
-    partial class BookingContextModelSnapshot : ModelSnapshot
+    [Migration("20210128205246_AddActivityNameIndex")]
+    partial class AddActivityNameIndex
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -49,14 +51,14 @@ namespace api.Migrations
                         new
                         {
                             Id = "037a87d5-2f44-474c-b494-295faeac310f",
-                            ConcurrencyStamp = "08d949cf-d476-4c33-824d-151c5c4eccc6",
+                            ConcurrencyStamp = "85d3a767-c8b3-440d-ac1c-a4e4d3dfc06f",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
                             Id = "b8973d7c-483d-4a3e-9d1b-c04a4d809323",
-                            ConcurrencyStamp = "22abc6da-6243-441e-909e-43e1863128c3",
+                            ConcurrencyStamp = "f9757193-b3c1-475e-a683-242d3d2fa53b",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -190,12 +192,14 @@ namespace api.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("Open")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Name");
 
                     b.ToTable("Activities");
                 });
@@ -319,7 +323,7 @@ namespace api.Migrations
                         {
                             Id = "8e3db864-4c10-41d8-8060-b4edb0534fac",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "a73d9853-9552-445f-83fc-f34e9e6dfff4",
+                            ConcurrencyStamp = "381bf745-b2dc-490d-a969-7f68c0cbe282",
                             Email = "alexander@gmail.com",
                             EmailConfirmed = true,
                             FirstName = "Alexander",
@@ -327,9 +331,9 @@ namespace api.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ALEXANDER@GMAIL.COM",
                             NormalizedUserName = "ALEXANDER@GMAIL.COM",
-                            PasswordHash = "AQAAAAEAACcQAAAAEAGQctphALF54TaXjcJUy9Y1cHJOjO1nPL7A98J4Lz2yg1WcPThZw3I/VoEN9u/JHg==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEI1DETVLv845E6BAJGPNH347fOwlREHZAN06bm/SkmmhAhSGIyeVgdySyx7pMACG7Q==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "31dc1aa7-754c-435d-ba10-55e858938095",
+                            SecurityStamp = "44109b67-cbf0-4c0b-b17c-f1dc7ee07d3f",
                             TwoFactorEnabled = false,
                             UserName = "alexander@gmail.com"
                         });

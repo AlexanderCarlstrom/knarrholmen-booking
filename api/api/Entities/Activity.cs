@@ -7,7 +7,6 @@ using Newtonsoft.Json;
 
 namespace api.Entities
 {
-    [Index(nameof(Name))]
     public class Activity
     {
         [Key] public string Id { get; set; }
