@@ -1,16 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 
-import './Home.scss';
-import { Button, Input } from 'antd';
-import { publicFetch } from '../../utils/axios';
+import { ActivityListItem } from '../../types/Activity';
 import { ActivitiesResponse } from '../../types/ApiReponse';
-import { Activities } from '../../types/Activities';
+import { publicFetch } from '../../utils/axios';
+import { Button, Input } from 'antd';
+import './Home.scss';
+import { CapitalizeFirstLetter } from '../../utils/CapitalizeFirstLetter';
+
+const { Search } = Input;
 
 const Home = ({ history }: RouteComponentProps) => {
   const [activities, setActivities] = useState([]);
   const search = (search: string) => {
-    history.push(`/activities/${search}`);
+    history.push('/activities', { search });
   };
 
   useEffect(() => {
@@ -19,7 +22,7 @@ const Home = ({ history }: RouteComponentProps) => {
       .then((a) => setActivities(a.data.activities));
   }, []);
 
-  const listActivities = activities.map((a: Activities) => {
+  const listActivities = activities.map((a: ActivityListItem) => {
     const open = a.open < 10 ? '0' + a.open + ':00' : a.open + ':00';
     const close = a.close < 10 ? '0' + a.close + ':00' : a.close + ':00';
     return (
@@ -27,7 +30,7 @@ const Home = ({ history }: RouteComponentProps) => {
         <div className="img" />
 
         <div className="info">
-          <span className="title">{a.name}</span>
+          <span className="title">{CapitalizeFirstLetter(a.name)}</span>
           <span className="location">{a.location}</span>
           <span className="open">{open + ' - ' + close}</span>
         </div>
@@ -42,7 +45,10 @@ const Home = ({ history }: RouteComponentProps) => {
   return (
     <div className="home">
       <div className="container">
-        <Input placeholder="Find activities..." className="search-field" />
+        <h1 className="home-title">KNARRHOLMEN</h1>
+        <h2 className="home-subtitle">BOOKING</h2>
+        {/*<Input placeholder="Find activities..." className="search-field" />*/}
+        <Search placeholder="Find activities..." className="search-field" allowClear onSearch={search} />
         <div className="activity-list">{listActivities}</div>
         <Button className="showMore">Show More</Button>
       </div>

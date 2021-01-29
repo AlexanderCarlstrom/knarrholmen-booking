@@ -1,82 +1,74 @@
 @import '../../variables.scss';
 
 .activities {
-  display: flex;
   min-height: $trimmedHeight;
-  flex-direction: column;
+  background: #fff;
 
-  .activities-header {
-    .inner {
-      padding: 40px 20px;
+  .container {
+    padding-top: 40px;
 
-      .search-field {
-        width: 100%;
+    .title {
+      font-family: $lato;
+      margin: auto;
+      font-size: 30px;
+      width: 306px;
+
+      @media (min-width: $md) {
+        width: 452px;
+      }
+      @media (min-width: $xl) {
+        width: 550px;
+      }
+    }
+
+    .search-field {
+      margin: 20px auto 0 auto;
+      width: 306px;
+      display: block;
+
+      @media (min-width: $md) {
+        width: 452px;
+      }
+      @media (min-width: $xl) {
+        width: 550px;
+      }
+
+      ::placeholder,
+      ::-ms-input-placeholder {
+        font-family: $roboto;
+        font-size: 12px;
       }
     }
   }
 
-  .activities-content {
-    background: #fff;
-    flex: 1 0;
-
-    .list {
-      display: flex;
+  .activity-list {
+    @media (min-width: $xl) {
       flex-direction: column;
-      padding: 24px 0;
+      justify-content: center;
+    }
 
-      .activity {
+    .activity {
+      @media (min-width: $xl) {
+        width: 550px;
         padding: 20px;
-        display: flex;
-        cursor: pointer;
-        transition: all 0.2s ease-in-out;
+        margin: 10px auto;
+        border: 1px solid $lightGray;
+        display: block;
+      }
 
-        .activity-img {
-          width: 120px;
-          height: 120px;
+      .img {
+        @media (min-width: $xl) {
+          width: 80px;
+          height: 80px;
+          margin: 0 20px 0 0;
         }
+      }
 
-        .activity-content {
-          margin-left: 20px;
-          position: relative;
-          flex: 1;
-
-          .title {
-            margin-bottom: 0;
-          }
-
-          .info {
-            list-style-type: none;
-            padding-left: 0;
-          }
-
-          .price {
-            position: absolute;
-            top: 0;
-            right: 0;
-          }
-
-          .activity-btn {
-            width: 100%;
-
-            @media (min-width: $sm) {
-              width: auto;
-              position: absolute;
-              bottom: 0;
-              right: 0;
-            }
-          }
-
-          .icon-margin {
-            margin-right: 5px;
-          }
+      .info {
+        @media (min-width: $xl) {
+          padding: 0;
         }
       }
     }
-  }
-
-  .activities-container {
-    width: 100%;
-    max-width: 720px;
-    margin: auto;
   }
 }

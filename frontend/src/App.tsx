@@ -21,7 +21,7 @@ const App = (props: RouteComponentProps) => {
   const { setUser, loginWithToken } = useAuth();
 
   useLayoutEffect(() => {
-    setUpAuthInterceptors(setUser);
+    setUpAuthInterceptors(setUser, loginWithToken);
   }, []);
 
   useEffect(() => {

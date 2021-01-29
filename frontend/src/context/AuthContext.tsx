@@ -29,6 +29,7 @@ const AuthProvider = ({ children }: ContainterProps) => {
     return privateFetch
       .get<UserResponse>('auth/login-with-token')
       .then((res: AxiosResponse<UserResponse>) => {
+        console.log(res.data);
         setUser(res.data.user);
       })
       .catch(() => {

@@ -1,5 +1,5 @@
 import { User } from './User';
-import { Activities, Activity } from './Activities';
+import { ActivityListItem, Activity } from './Activity';
 
 export interface ApiResponse {
   success: boolean;
@@ -13,6 +13,6 @@ export interface UserResponse extends ApiResponse {
 }
 
 export interface ActivitiesResponse {
-  activities?: Activities[];
+  activities?: ActivityListItem[];
   activity?: Activity;
 }

@@ -1,95 +1,74 @@
-import { EnvironmentOutlined, ClockCircleOutlined } from '@ant-design/icons';
-import { Button, Form, Input, Typography, Image, Divider } from 'antd';
+import { Input } from 'antd';
 import React, { useEffect, useState } from 'react';
+import debounce from 'lodash.debounce';
 
-import { fallbackImage } from '../../utils/fallbackImage';
-import { activities } from '../../fakeData';
 import './Activities.scss';
 import { RouteComponentProps } from 'react-router-dom';
+import { publicFetch } from '../../utils/axios';
+import { ActivitiesResponse } from '../../types/ApiReponse';
+import { AxiosResponse } from 'axios';
+import { ActivityListItem } from '../../types/Activity';
+import { CapitalizeFirstLetter } from '../../utils/CapitalizeFirstLetter';
 
-const { Title, Text } = Typography;
+const { Search } = Input;
 
 type Params = {
   search: string;
 };
 
-const Activities = ({ match }: RouteComponentProps<Params>) => {
-  const [searchTerm, setSearchTerm] = useState('');
+const Activities = ({ location, history }: RouteComponentProps<Params>) => {
+  const [searchTerm, setSearchTerm] = useState(location.search ? location.search : '');
   const [searchResult, setSearchResult] = useState([]);
-  let mounted = false;
+  const [page, setPage] = useState(1);
+  const activitiesPerPage = 10;
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = debounce((e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
-  };
+  }, 500);
 
   useEffect(() => {
-    if (!mounted) {
-      const { search } = match.params;
-      if (search) setSearchTerm(search);
-      mounted = true;
-    }
-    const result = activities.filter((activity) => activity.name.toLowerCase().includes(searchTerm.toLowerCase()));
-    setSearchResult(result);
+    console.log(location.search);
+    const start = (page - 1) * activitiesPerPage;
+    publicFetch
+      .get<ActivitiesResponse>('activities', { params: { search: searchTerm, start, limit: activitiesPerPage } })
+      .then((res: AxiosResponse<ActivitiesResponse>) => {
+        setSearchResult(res.data.activities);
+      });
   }, [searchTerm]);
 
-  const list = searchResult.map((activity) => (
-    <div key={activity.id}>
-      <div className="activity">
-        <Image src={activity.img} fallback={fallbackImage} className="activity-img" />
-        <div className="activity-content">
-          <Title level={4} className="title">
-            {activity.name}
-          </Title>
-          <ul className="info">
-            <li>
-              <Text type="secondary">
-                <EnvironmentOutlined className="icon-margin" />
-                {activity.location}
-              </Text>
-            </li>
-            <li>
-              <Text type="secondary" className="opening-hours">
-                <ClockCircleOutlined className="icon-margin" />
-                {activity.open + '-' + activity.close}
-              </Text>
-            </li>
-          </ul>
-          <Title level={5} className="price no-margin">
-            {activity.price}kr
-          </Title>
-          <Button type="primary" className="activity-btn no-margin">
-            SEE MORE
-          </Button>
+  const navigateToActivity = (id: string) => {
+    history.push('/activity/' + id);
+  };
+
+  const list = searchResult.map((activity: ActivityListItem) => {
+    const open = activity.open < 10 ? '0' + activity.open + ':00' : activity.open + ':00';
+    const close = activity.close < 10 ? '0' + activity.close + ':00' : activity.close + ':00';
+
+    return (
+      <div className="activity" key={activity.id} onClick={() => navigateToActivity(activity.id)}>
+        <div className="img" />
+
+        <div className="info">
+          <span className="title">{CapitalizeFirstLetter(activity.name)}</span>
+          <span className="location">{activity.location}</span>
+          <span className="open">{open + ' - ' + close}</span>
         </div>
       </div>
-      <Divider />
-    </div>
-  ));
+    );
+  });
 
   return (
     <div className="activities">
-      <div className="activities-header">
-        <div className="activities-container">
-          <div className="inner">
-            <Title level={2} className="title">
-              Find activities
-            </Title>
-            <Form.Item className="search-field">
-              <Input
-                name="search"
-                placeholder="Find activities"
-                size="large"
-                value={searchTerm}
-                onChange={handleChange}
-              />
-            </Form.Item>
-          </div>
-        </div>
-      </div>
-      <div className="activities-content">
-        <div className="activities-container">
-          <div className="list">{list}</div>
-        </div>
+      <div className="container">
+        <h2 className="title">Find activities</h2>
+        <Search
+          placeholder="Find activities..."
+          className="search-field"
+          allowClear
+          onChange={handleChange}
+          defaultValue={location.search}
+        />
+        <div className="activity-list">{list}</div>
       </div>
     </div>
   );

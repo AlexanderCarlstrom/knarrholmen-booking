@@ -1,4 +1,4 @@
-export interface Activities {
+export interface ActivityListItem {
   id: string;
   name: string;
   location: string;
