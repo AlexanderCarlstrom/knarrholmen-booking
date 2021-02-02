@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 
-import { ActivityListItem } from '../../types/Activity';
+import { ActivityListItem } from '../../types/ActivityItem';
 import { ActivitiesResponse } from '../../types/ApiReponse';
 import { publicFetch } from '../../utils/axios';
 import { Button, Input } from 'antd';
@@ -47,10 +47,11 @@ const Home = ({ history }: RouteComponentProps) => {
       <div className="container">
         <h1 className="home-title">KNARRHOLMEN</h1>
         <h2 className="home-subtitle">BOOKING</h2>
-        {/*<Input placeholder="Find activities..." className="search-field" />*/}
         <Search placeholder="Find activities..." className="search-field" allowClear onSearch={search} />
         <div className="activity-list">{listActivities}</div>
-        <Button className="showMore">Show More</Button>
+        <Button className="showMore" onClick={() => search('')}>
+          Show More
+        </Button>
       </div>
     </div>
   );

@@ -6,7 +6,7 @@ export interface ActivityListItem {
   close: number;
 }
 
-export interface Activity {
+export interface ActivityItem {
   id: string;
   name: string;
   description: string;

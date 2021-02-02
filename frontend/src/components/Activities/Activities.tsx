@@ -1,14 +1,14 @@
-import { Input } from 'antd';
 import React, { useEffect, useState } from 'react';
 import debounce from 'lodash.debounce';
+import { Input } from 'antd';
 
-import './Activities.scss';
-import { RouteComponentProps } from 'react-router-dom';
-import { publicFetch } from '../../utils/axios';
-import { ActivitiesResponse } from '../../types/ApiReponse';
-import { AxiosResponse } from 'axios';
-import { ActivityListItem } from '../../types/Activity';
 import { CapitalizeFirstLetter } from '../../utils/CapitalizeFirstLetter';
+import { ActivitiesResponse } from '../../types/ApiReponse';
+import { RouteComponentProps } from 'react-router-dom';
+import { ActivityListItem } from '../../types/ActivityItem';
+import { publicFetch } from '../../utils/axios';
+import { AxiosResponse } from 'axios';
+import './Activities.scss';
 
 const { Search } = Input;
 

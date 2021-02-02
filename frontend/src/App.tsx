@@ -14,6 +14,7 @@ import './App.scss';
 import { setUpAuthInterceptors } from './utils/axios';
 import { useAuth } from './context/AuthContext';
 import PrivateRoute from './utils/PrivateRoute';
+import Activity from './components/Activity/Activity';
 
 const { Content } = Layout;
 
@@ -36,6 +37,7 @@ const App = (props: RouteComponentProps) => {
           <Route exact path="/" component={Home} />
           <Route path="/activities/:search?" component={Activities} />
           <PrivateRoute path="/bookings" component={Bookings} />
+          <Route path="/activity/:id" component={Activity} />
           <Route path="/auth" component={Auth} />
           <Route path="/logout" component={Logout} />
           <Route render={() => <Redirect exact to="/" />} />
