@@ -41,10 +41,10 @@ namespace api.Controllers
             return StatusCode(response.StatusCode, response);
         }
 
-        [HttpGet("{date}")]
-        public async Task<IActionResult> GetBookingsDay(DateTime date)
+        [HttpGet]
+        public async Task<IActionResult> GetBookingsDay([FromQuery] BookingsDayRequest model)
         {
-            var response = await _bookingService.GetBookingsDay(date);
+            var response = await _bookingService.GetBookingsDay(model);
             return StatusCode(response.StatusCode, response);
         }
 

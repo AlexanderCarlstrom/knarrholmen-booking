@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
@@ -32,7 +33,7 @@ namespace api.Services
         /// <summary>
         /// Get all bookings in given day
         /// </summary>
-        Task<BookingResponse> GetBookingsDay(DateTime date);
+        Task<BookingResponse> GetBookingsDay(BookingsDayRequest model);
 
         /// <summary>
         /// Get all future bookings for current user
@@ -60,15 +61,24 @@ namespace api.Services
 
         public async Task<ApiResponse> Create(BookingRequest model)
         {
+            // Check if activity exist
+            var activity = await _bookingDbContext.Activities.FindAsync(model.ActivityId);
+            if (activity == null) return new ApiResponse(400, "Activity does not exist");
+
+            // Check if booking is within open hours
+            if (model.Start.Hour < activity.Open || model.Start.Hour >= activity.Close)
+                return new ApiResponse(400, "Booking cannot be made outside of open hours");
+
+            // Get current user
             var user = await _userManager.GetUserAsync(model.UserPrincipal);
-            
+
             var userRoles = await _userManager.GetRolesAsync(user);
             if (!userRoles.Contains(UserRoles.Admin))
             {
-                // check if bookings is to long
+                // Check if bookings is to long
                 var diff = model.End - model.Start;
                 if (diff.TotalMinutes > 60) return new ApiResponse(400, "Booking time is to long");
-                // check if user already have a booking that day
+                // Check if user already have a booking that day
                 var from = new DateTime(model.Start.Year, model.Start.Month, model.Start.Day);
                 var to = GetNextDay(from);
                 var result = await _bookingDbContext.Bookings.AnyAsync(b =>
@@ -76,7 +86,7 @@ namespace api.Services
                 if (result) return new ApiResponse(400, "A booking already exist for user that day");
             }
 
-            // check if there is already a booking at that time
+            // Check if there is already a booking at that time
             var exist = await _bookingDbContext.Bookings.AnyAsync(b =>
                 b.ActivityId == model.ActivityId && b.Start < model.End && model.Start < b.End);
             if (exist) return new ApiResponse(400, "A booking already exist in time period");
@@ -91,57 +101,134 @@ namespace api.Services
 
         public async Task<BookingResponse> GetBookingsWeek(BookingsWeekRequest model)
         {
+            // Get activity and check if it exists
+            var activity = await _bookingDbContext.Activities.Include(a => a.Bookings)
+                .Where(a => a.Id == model.ActivityId).FirstAsync();
+            if (activity == null) return new BookingResponse(400, "Activity does not exist");
+
             var date = DateTime.Now;
-            // check if year is in the before or more than 1 year after current year
+            // Check if year is in the before or more than 1 year after current year
             if (model.Year < date.Year || model.Year > date.Year + 1)
                 return new BookingResponse(400, "Year must be current or next year");
 
-            // check if week is before current week
+            // Check if week is before current week
             if (model.Year == date.Year && model.Week < ISOWeek.GetWeekOfYear(date))
                 return new BookingResponse(400, "Week must be in the future");
 
-            // check if week is less than 1
+            // Check if week is less than 1
             if (model.Week < 1) return new BookingResponse(400, "Week must be at least 1");
             var numberOfWeeks = ISOWeek.GetWeeksInYear(model.Year);
-            // check if week is more than number of weeks in given year
+
+            // Check if week is more than number of weeks in given year
             if (model.Week > numberOfWeeks)
                 return new BookingResponse(400, "Week must be at most " + numberOfWeeks);
 
-            var from = ISOWeek.ToDateTime(model.Year, model.Week, DayOfWeek.Monday);
+            // Calculate from and to dates for use in query
+            var now = DateTime.Now;
+            var startOfWeek = ISOWeek.ToDateTime(model.Year, model.Week, DayOfWeek.Monday);
+            var from = now > startOfWeek ? now : startOfWeek;
             var nextWeek = model.Week == numberOfWeeks ? 1 : model.Week + 1;
             var newYear = model.Week == numberOfWeeks ? model.Year + 1 : model.Year;
             var to = ISOWeek.ToDateTime(newYear, nextWeek, DayOfWeek.Monday);
 
-            var bookings = await _bookingDbContext.Bookings.Where(b => b.Start >= from && b.Start < to)
-                .Select(b => _mapper.Map<PublicBookingsDto>(b)).ToListAsync();
-            return new BookingResponse(bookings);
+            // Get bookings in given week from now
+            // var bookings = activity.Bookings.Where(b => b.Start >= from && b.Start < to)
+            //     .Select(b => _mapper.Map<PublicBookingsDto>(b)).ToList();
+            var bookings = activity.Bookings.Where(b => b.Start >= from && b.Start < to);
+
+            var openHours = activity.Close - activity.Open;
+            var times = new int[7][];
+            // Generate array with all bookings in a week
+            for (var i = 0; i < 7; i++)
+            {
+                times[i] = new int[openHours];
+                for (var j = 0; j < openHours; j++)
+                {
+                    var dateTime = startOfWeek.AddDays(i).AddHours(activity.Open + j);
+                    if (now > dateTime)
+                    {
+                        times[i][j] = 2;
+                    }
+                }
+            }
+
+            // Go through bookings and set times as booked
+            foreach (var booking in bookings)
+            {
+                var current = booking.Start;
+                while (current < booking.End)
+                {
+                    var day = GetDayOfWeek(current.DayOfWeek);
+                    var hour = current.Hour - activity.Open;
+                    if (times[day][hour] != 2)
+                    {
+                        times[day][hour] = 1;
+                    }
+
+                    current = current.AddHours(1);
+                }
+            }
+
+
+            return new BookingResponse(times);
         }
 
-        public async Task<BookingResponse> GetBookingsDay(DateTime date)
+        public async Task<BookingResponse> GetBookingsDay(BookingsDayRequest model)
         {
+            // Get activity and check if it exists
+            var activity = await _bookingDbContext.Activities.Include(a => a.Bookings)
+                .Where(a => a.Id == model.ActivityId).FirstAsync();
+            if (activity == null) return new BookingResponse(400, "Activity does not exist");
+
             var today = DateTime.Today;
-            // check if date is in the past
-            if (date < today) return new BookingResponse(400, "Date must be in the future");
+            // Check if date is in the past
+            if (model.Date < today) return new BookingResponse(400, "Date must be in the future");
 
-            var year = date.Year;
-            var month = date.Month;
-            var day = date.Day;
+            var year = model.Date.Year;
+            var month = model.Date.Month;
+            var day = model.Date.Day;
 
-            var from = new DateTime(year, month, day);
+            var date = new DateTime(year, month, day);
+            var now = DateTime.Now;
+            var from = now > date ? now : date;
 
             var to = GetNextDay(from);
 
-            var bookings = await _bookingDbContext.Bookings
-                .Where(booking => booking.Start >= from && booking.Start < to)
-                .Select(booking => _mapper.Map<PublicBookingsDto>(booking)).ToListAsync();
+            // Get bookings in given day
+            var bookings = activity.Bookings.Where(booking => booking.Start >= from && booking.Start < to);
 
-            return new BookingResponse(bookings);
+            var times = new List<int>();
+            for (var i = activity.Open; i < activity.Close; i++)
+            {
+                if (now < date.AddHours(i))
+                {
+                    times.Add(i);
+                }
+            }
+
+            // Go through bookings and set times as booked
+            foreach (var booking in bookings)
+            {
+                var current = booking.Start;
+                while (current < booking.End)
+                {
+                    var hour = current.Hour - activity.Open;
+                    times.RemoveAt(hour);
+
+                    current = current.AddHours(1);
+                }
+            }
+
+            return new BookingResponse(times);
         }
 
         public async Task<BookingResponse> GetFutureBookings(ClaimsPrincipal userPrincipal)
         {
+            // Get current user
             var user = await _userManager.GetUserAsync(userPrincipal);
             var now = DateTime.Now;
+
+            // Get future bookings
             var bookings = await _bookingDbContext.Bookings
                 .Where(booking => booking.UserId == user.Id && booking.Start >= now)
                 .Select(booking => _mapper.Map<PrivateBookingsDto>(booking)).ToListAsync();
@@ -151,8 +238,11 @@ namespace api.Services
 
         public async Task<BookingResponse> GetPastBookings(ClaimsPrincipal userPrincipal)
         {
+            // Get current user
             var user = await _userManager.GetUserAsync(userPrincipal);
             var now = DateTime.Now;
+
+            // Get past bookings
             var bookings = await _bookingDbContext.Bookings
                 .Where(booking => booking.UserId == user.Id && booking.Start < now)
                 .Select(booking => _mapper.Map<PrivateBookingsDto>(booking)).ToListAsync();
@@ -160,6 +250,11 @@ namespace api.Services
             return new BookingResponse(bookings);
         }
 
+        /// <summary>
+        /// Calculates next day
+        /// </summary>
+        /// <param name="today">Current day</param>
+        /// <returns>Next day</returns>
         private static DateTime GetNextDay(DateTime today)
         {
             var year = today.Year;
@@ -180,6 +275,34 @@ namespace api.Services
             else day++;
 
             return new DateTime(year, month, day);
+        }
+
+        /// <summary>
+        /// Gets the correct day of week
+        /// </summary>
+        /// <param name="day"></param>
+        /// <returns>The number associated with given day of week</returns>
+        private int GetDayOfWeek(DayOfWeek day)
+        {
+            switch (day)
+            {
+                case DayOfWeek.Monday:
+                    return 0;
+                case DayOfWeek.Tuesday:
+                    return 1;
+                case DayOfWeek.Wednesday:
+                    return 2;
+                case DayOfWeek.Thursday:
+                    return 3;
+                case DayOfWeek.Friday:
+                    return 4;
+                case DayOfWeek.Saturday:
+                    return 5;
+                case DayOfWeek.Sunday:
+                    return 6;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(day), day, null);
+            }
         }
     }
 }

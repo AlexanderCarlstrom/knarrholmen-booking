@@ -7,5 +7,6 @@ namespace api.Contracts.Requests
     {
         public int Year { get; set; }
         public int Week { get; set; }
+        public string ActivityId { get; set; }
     }
 }
