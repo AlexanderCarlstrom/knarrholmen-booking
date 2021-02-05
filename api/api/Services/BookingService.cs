@@ -212,7 +212,8 @@ namespace api.Services
                 var current = booking.Start;
                 while (current < booking.End)
                 {
-                    var hour = current.Hour - activity.Open;
+                    var hour = current.Hour - times.Count;
+                    Console.WriteLine(times[hour]);
                     times.RemoveAt(hour);
 
                     current = current.AddHours(1);
