@@ -45,13 +45,13 @@ namespace api
             {
                 // user name config
                 options.User.RequireUniqueEmail = true;
-                options.SignIn.RequireConfirmedEmail = true;
+                options.SignIn.RequireConfirmedEmail = false;
             });
 
             services.ConfigureApplicationCookie(options =>
             {
                 options.Cookie.Name = Authorization.AccessTokenCookieName;
-                options.ExpireTimeSpan = TimeSpan.FromMinutes(1);
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(15);
                 options.Cookie.HttpOnly = true;
                 options.LoginPath = "/auth/unauthorized";
                 options.AccessDeniedPath = "/auth/access-denied";
