@@ -124,7 +124,8 @@ namespace api.Services
                 return new BookingResponse(400, "Week must be at most " + numberOfWeeks);
 
             // Calculate from and to dates for use in query
-            var now = DateTime.Now;
+            var centralEuropean = TimeZoneInfo.FindSystemTimeZoneById("Central European Standard Time");
+            var now = TimeZoneInfo.ConvertTime(DateTime.Now, centralEuropean);
             var startOfWeek = ISOWeek.ToDateTime(model.Year, model.Week, DayOfWeek.Monday);
             var from = now > startOfWeek ? now : startOfWeek;
             var nextWeek = model.Week == numberOfWeeks ? 1 : model.Week + 1;
@@ -132,8 +133,6 @@ namespace api.Services
             var to = ISOWeek.ToDateTime(newYear, nextWeek, DayOfWeek.Monday);
 
             // Get bookings in given week from now
-            // var bookings = activity.Bookings.Where(b => b.Start >= from && b.Start < to)
-            //     .Select(b => _mapper.Map<PublicBookingsDto>(b)).ToList();
             var bookings = activity.Bookings.Where(b => b.Start >= from && b.Start < to);
 
             var openHours = activity.Close - activity.Open;
@@ -189,7 +188,8 @@ namespace api.Services
             var day = model.Date.Day;
 
             var date = new DateTime(year, month, day);
-            var now = DateTime.Now;
+            var centralEuropean = TimeZoneInfo.FindSystemTimeZoneById("Central European Standard Time");
+            var now = TimeZoneInfo.ConvertTime(DateTime.Now, centralEuropean);
             var from = now > date ? now : date;
 
             var to = GetNextDay(from);
@@ -198,22 +198,24 @@ namespace api.Services
             var bookings = activity.Bookings.Where(booking => booking.Start >= from && booking.Start < to);
 
             var times = new List<int>();
+            now = DateRoundUp(now);
             for (var i = activity.Open; i < activity.Close; i++)
             {
-                if (now < date.AddHours(i))
+                if (now <= date.AddHours(i))
                 {
                     times.Add(i);
                 }
             }
 
+            var openHours = activity.Close - activity.Open;
+            var diff = openHours - times.Count;
             // Go through bookings and set times as booked
             foreach (var booking in bookings)
             {
                 var current = booking.Start;
                 while (current < booking.End)
                 {
-                    var hour = current.Hour - times.Count;
-                    Console.WriteLine(times[hour]);
+                    var hour = current.Hour - (activity.Open - diff);
                     times.RemoveAt(hour);
 
                     current = current.AddHours(1);
@@ -252,10 +254,8 @@ namespace api.Services
         }
 
         /// <summary>
-        /// Calculates next day
+        /// Calculates next day from given datetime
         /// </summary>
-        /// <param name="today">Current day</param>
-        /// <returns>Next day</returns>
         private static DateTime GetNextDay(DateTime today)
         {
             var year = today.Year;
@@ -281,8 +281,6 @@ namespace api.Services
         /// <summary>
         /// Gets the correct day of week
         /// </summary>
-        /// <param name="day"></param>
-        /// <returns>The number associated with given day of week</returns>
         private int GetDayOfWeek(DayOfWeek day)
         {
             switch (day)
@@ -304,6 +302,12 @@ namespace api.Services
                 default:
                     throw new ArgumentOutOfRangeException(nameof(day), day, null);
             }
+        }
+
+        private DateTime DateRoundUp(DateTime date)
+        {
+            var thisHour = (new DateTime(date.Year, date.Month, date.Day)).AddHours(date.Hour);
+            return thisHour < date ? thisHour.AddHours(1) : thisHour;
         }
     }
 }
