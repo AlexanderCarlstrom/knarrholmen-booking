@@ -26,7 +26,7 @@ const Home = ({ history }: RouteComponentProps) => {
     const open = a.open < 10 ? '0' + a.open + ':00' : a.open + ':00';
     const close = a.close < 10 ? '0' + a.close + ':00' : a.close + ':00';
     return (
-      <div className="activity" key={a.id} onClick={() => navigateToActivity(a.id)}>
+      <div className="activity-item" key={a.id} onClick={() => navigateToActivity(a.id)}>
         <div className="img" />
 
         <div className="info">

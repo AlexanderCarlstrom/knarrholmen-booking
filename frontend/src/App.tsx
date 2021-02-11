@@ -19,10 +19,10 @@ import Activity from './components/Activity/Activity';
 const { Content } = Layout;
 
 const App = (props: RouteComponentProps) => {
-  const { setUser, loginWithToken } = useAuth();
+  const { loginWithToken } = useAuth();
 
   useLayoutEffect(() => {
-    setUpAuthInterceptors(setUser, loginWithToken);
+    setUpAuthInterceptors(loginWithToken);
   }, []);
 
   useEffect(() => {

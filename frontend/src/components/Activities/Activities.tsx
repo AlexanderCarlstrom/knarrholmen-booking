@@ -27,7 +27,6 @@ const Activities = ({ location, history }: RouteComponentProps<Params>) => {
   }, 500);
 
   useEffect(() => {
-    console.log(location.search);
     const start = (page - 1) * activitiesPerPage;
     publicFetch
       .get<ActivitiesResponse>('activities', { params: { search: searchTerm, start, limit: activitiesPerPage } })
@@ -45,7 +44,7 @@ const Activities = ({ location, history }: RouteComponentProps<Params>) => {
     const close = activity.close < 10 ? '0' + activity.close + ':00' : activity.close + ':00';
 
     return (
-      <div className="activity" key={activity.id} onClick={() => navigateToActivity(activity.id)}>
+      <div className="activity-item" key={activity.id} onClick={() => navigateToActivity(activity.id)}>
         <div className="img" />
 
         <div className="info">

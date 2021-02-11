@@ -35,7 +35,7 @@
 
       ::placeholder,
       ::-ms-input-placeholder {
-        font-family: $roboto;
+        font-family: $openSans;
         font-size: 12px;
       }
     }
@@ -47,7 +47,7 @@
       justify-content: center;
     }
 
-    .activity {
+    .activity-item {
       @media (min-width: $xl) {
         width: 550px;
         padding: 20px;

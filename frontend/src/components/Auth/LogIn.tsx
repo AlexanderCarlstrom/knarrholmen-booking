@@ -6,12 +6,12 @@ import { AxiosError } from 'axios';
 import 'antd/dist/antd.css';
 import * as Yup from 'yup';
 
-import { ApiResponse } from '../../types/ApiReponse';
-import FormCheckbox from '../Shared/FormCheckbox/FormCheckbox';
-import { FormInput } from '../Shared/FormInput/FormInput';
 import FormErrors from '../Shared/FormErrors/FormErrors';
-import './Auth.scss';
+import { FormInput } from '../Shared/FormInput/FormInput';
+import { ApiResponse } from '../../types/ApiReponse';
 import { useAuth } from '../../context/AuthContext';
+import FormCheckbox from '../Shared/FormCheckbox';
+import './Auth.scss';
 
 const { Text, Link } = Typography;
 

@@ -13,19 +13,25 @@ code {
 .container {
   width: 100%;
   max-width: 400px;
+  min-width: 316px;
+  padding: 0 20px;
   margin: auto;
 
   @media (min-width: $sm) {
     max-width: 540px;
+    padding: 0;
   }
   @media (min-width: $md) {
     max-width: 720px;
+    padding: 0;
   }
   @media (min-width: $lg) {
     max-width: 960px;
+    padding: 0;
   }
   @media (min-width: $xl) {
     max-width: 1140px;
+    padding: 0;
   }
 }
 
@@ -39,7 +45,7 @@ code {
     justify-content: center;
   }
 
-  .activity {
+  .activity-item {
     width: 306px;
     padding: 10px;
     margin: 5px auto;
@@ -98,10 +104,15 @@ code {
       }
 
       span {
-        font-family: $roboto;
-        font-size: 12px;
+        font-family: $openSans;
+        font-size: 10px;
         color: $secondaryText;
         margin: 0;
+
+        @media (min-width: $md) {
+          font-size: 12px;
+        }
+
 
         &.title {
           color: #000;
@@ -120,8 +131,13 @@ code {
         &.open {
           grid-area: open;
           text-align: right;
+          font-variant: tabular-nums;
         }
       }
     }
   }
+}
+
+.open-hours {
+  font-size: 12px;
 }

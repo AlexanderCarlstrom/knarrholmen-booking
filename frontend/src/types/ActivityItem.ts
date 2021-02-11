@@ -9,7 +9,7 @@ export interface ActivityListItem {
 export interface ActivityItem {
   id: string;
   name: string;
-  description: string;
+  description?: string;
   location: string;
   open: number;
   close: number;
